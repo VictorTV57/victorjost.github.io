@@ -1,0 +1,21 @@
+---
+import { site } from '../data/site';
+---
+<div class="contact-box reveal">
+  <h2>On en parle ?</h2>
+  <p>Une question sur un projet, une opportunité de stage ? Écris-moi, je réponds vite.</p>
+  <div class="actions">
+    <a class="btn" href={`mailto:${site.email}`}><svg aria-hidden="true"><use href="#mail" /></svg>{site.email}</a>
+    <a class="btn ghost" href={site.linkedin} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#in" /></svg>LinkedIn</a>
+  </div>
+</div>
+
+<style>
+  .contact-box { background: var(--ink); color: var(--surface); padding: var(--space-12) var(--space-6); }
+  .contact-box :focus-visible { outline-color: var(--brand-light); }
+  .contact-box h2 { color: var(--surface); font-size: 40px; line-height: 44px; font-weight: 800; }
+  .contact-box h2::before { background: var(--accent); }
+  p { color: var(--ink-text); margin: 0 0 var(--space-6); max-width: 52ch; }
+  .contact-box .actions { margin-top: 0; }
+  @media (max-width: 560px) { .contact-box { padding: 32px 16px; } }
+</style>

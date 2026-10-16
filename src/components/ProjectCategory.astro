@@ -1,0 +1,54 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+
+interface Props {
+  title: string;
+  /** Déjà triés par `order` : le premier s'affiche, les autres vont dans le repli. */
+  projects: CollectionEntry<'projects'>[];
+}
+
+const { title, projects } = Astro.props;
+const [first, ...rest] = projects;
+const more = rest.length === 1 ? 'Voir 1 autre projet' : `Voir ${rest.length} autres projets`;
+---
+{first && (
+  <div class="cat">
+    <h3 class="cat-title">{title}</h3>
+    <ProjectCard project={first} reveal />
+    {rest.length > 0 && (
+      <details class="fold">
+        <summary>
+          <span class="when-closed">{more}</span><span class="when-open">Masquer</span>
+          <svg aria-hidden="true"><use href="#chev" /></svg>
+        </summary>
+        <div class="fold-body">
+          {rest.map((project) => <ProjectCard project={project} />)}
+        </div>
+      </details>
+    )}
+  </div>
+)}
+
+<style>
+  .cat { margin-bottom: var(--space-12); }
+  .cat:last-child { margin-bottom: 0; }
+
+  /* Repli « Voir d'autres projets » */
+  .fold { margin-top: var(--space-4); }
+  .fold summary {
+    list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
+    font: 500 14px/20px var(--font-sans); color: var(--ink); padding: 6px 12px;
+    background: var(--surface); border: 1px solid var(--ink-muted); border-radius: var(--radius-sm);
+  }
+  .fold summary::-webkit-details-marker { display: none; }
+  .fold summary:hover { border-color: var(--ink); }
+  .fold summary svg { width: 16px; height: 16px; transition: transform .25s; }
+  .fold[open] summary svg { transform: rotate(180deg); }
+  .fold .when-open { display: none; }
+  .fold[open] .when-open { display: inline; }
+  .fold[open] .when-closed { display: none; }
+  .fold-body { padding-top: var(--space-4); }
+  .fold::details-content { block-size: 0; overflow: hidden; transition: block-size .45s var(--ease-out), content-visibility .45s allow-discrete; }
+  .fold[open]::details-content { block-size: auto; }
+</style>

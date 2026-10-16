@@ -1,0 +1,69 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { url } from '../data/site';
+import ImperiumExplorer from './ImperiumExplorer.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  reveal?: boolean;
+}
+
+const { project, reveal = false } = Astro.props;
+const { title, kind, summary, thumb, tags, status, repo, page } = project.data;
+
+// Blocs interactifs rattachés à un projet, par identifiant (nom du fichier .md)
+const extras: Record<string, typeof ImperiumExplorer> = { imperium: ImperiumExplorer };
+const Extra = extras[project.id];
+---
+<article class:list={['project', { reveal }]}>
+  <div class="thumb" aria-hidden="true">
+    <img src={thumb.src} width={thumb.width} height={thumb.height} alt="" loading="lazy" decoding="async" />
+  </div>
+  <div>
+    <h3>{title}</h3>
+    <div class="kind">{kind}</div>
+    <p>{summary}</p>
+    {status && <span class="status">{status}</span>}
+    <div class="meta">
+      <ul class="tags">{tags.map((tag) => <li>{tag}</li>)}</ul>
+      {page ? (
+        <a class="code-link" href={url(`projets/${project.id}/`)}><svg aria-hidden="true"><use href="#camera" /></svg>Voir les photos</a>
+      ) : repo ? (
+        <a class="code-link" href={repo} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh" /></svg>Voir le code</a>
+      ) : project.data.private ? (
+        <span class="private"><svg aria-hidden="true"><use href="#lock" /></svg>Code privé</span>
+      ) : (
+        <span class="private"><svg aria-hidden="true"><use href="#gh" /></svg>Dépôt à venir</span>
+      )}
+    </div>
+  </div>
+  {Extra && <Extra />}
+</article>
+
+<style>
+  .project {
+    display: grid; grid-template-columns: 96px 1fr; gap: var(--space-6);
+    background: var(--surface); border: 1px solid var(--line); padding: var(--space-6);
+    transition: border-color .15s;
+  }
+  .project + .project { margin-top: var(--space-4); }
+  .project:hover { border-color: var(--ink-muted); }
+  .thumb { width: 96px; height: 96px; border: 1px solid var(--line); overflow: hidden; }
+  .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  h3 { margin: 0; font-size: 20px; line-height: 26px; font-weight: 700; }
+  .kind { font-size: 14px; color: var(--ink-muted); margin-top: 2px; }
+  p { margin: var(--space-2) 0 0; }
+  .meta { margin-top: var(--space-4); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+  .code-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; text-decoration: none; color: var(--brand); white-space: nowrap; }
+  .code-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .code-link svg { width: 18px; height: 18px; }
+  .private { font-size: 14px; color: var(--ink-muted); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .private svg { width: 16px; height: 16px; }
+  .status { font-size: 13px; color: var(--ink-muted); display: inline-flex; align-items: center; gap: 6px; margin-top: var(--space-2); }
+  .status::before { content: ""; width: 8px; height: 8px; background: var(--success); }
+
+  @media (max-width: 560px) {
+    .project { grid-template-columns: 1fr; gap: var(--space-4); }
+    .thumb { width: 100%; height: 120px; }
+  }
+</style>

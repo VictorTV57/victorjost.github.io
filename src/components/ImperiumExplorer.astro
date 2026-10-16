@@ -1,0 +1,91 @@
+---
+// Explorateur Imperium : un même appel, moteur par moteur.
+interface Row {
+  engine: string;
+  lang: string;
+  location: string;
+  call: string;
+}
+
+const engines = [
+  { id: 'Roblox', label: 'Roblox' },
+  { id: 'Unity', label: 'Unity' },
+  { id: 'Unreal', label: 'Unreal' },
+  { id: 'Godot', label: 'Godot' },
+  { id: 'Maison', label: 'Moteur maison' },
+  { id: 'Web', label: 'Web' },
+];
+
+const rows: Row[] = [
+  { engine: 'Roblox', lang: 'Luau', location: 'Imperium/Mundus/Hora', call: 'Hora.SetTime(18)' },
+  { engine: 'Unity', lang: 'C#', location: 'namespace Imperium.Mundus', call: 'Hora.SetTime(18)' },
+  { engine: 'Unreal', lang: 'C++', location: 'plugin Imperium, module ImperiumMundus', call: 'UHora::SetTime(18)' },
+  { engine: 'Godot', lang: 'GDScript', location: 'addons/imperium/mundus/hora', call: 'Hora.set_time(18)' },
+  { engine: 'Godot', lang: 'C#', location: 'namespace Imperium.Mundus', call: 'Hora.SetTime(18)' },
+  { engine: 'Maison', lang: 'C++', location: 'imperium::mundus::hora', call: 'hora::set_time(18)' },
+  { engine: 'Maison', lang: 'C#', location: 'namespace Imperium.Mundus', call: 'Hora.SetTime(18)' },
+  { engine: 'Maison', lang: 'C', location: 'imperium/mundus/hora.h', call: 'imperium_hora_set_time(18)' },
+  { engine: 'Maison', lang: 'Java', location: 'io.github.imperium_systems.mundus', call: 'Hora.setTime(18)' },
+  { engine: 'Maison', lang: 'Python', location: 'imperium.mundus.hora', call: 'hora.set_time(18)' },
+  { engine: 'Maison', lang: 'Rust', location: 'imperium::mundus::hora', call: 'hora::set_time(18)' },
+  { engine: 'Web', lang: 'TypeScript', location: '@imperium-systems/mundus', call: 'Hora.setTime(18)' },
+];
+
+const initial = engines[0].id;
+---
+<div class="imp" data-imperium>
+  <div class="imp-head">
+    <span class="imp-label" id="imp-label">Régler l'heure à 18 h avec Hora</span>
+  </div>
+  <div class="imp-engines" role="tablist" aria-labelledby="imp-label">
+    {engines.map(({ id, label }) => (
+      <button type="button" role="tab" aria-selected={id === initial ? 'true' : 'false'} aria-controls="imp-table" data-engine={id}>{label}</button>
+    ))}
+  </div>
+  <table class="imp-table" id="imp-table" role="tabpanel">
+    <thead><tr><th scope="col">Langage</th><th scope="col">Emplacement</th><th scope="col">Appel</th></tr></thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr data-engine={r.engine} hidden={r.engine !== initial}>
+          <td>{r.lang}</td><td><code>{r.location}</code></td><td><code>{r.call}</code></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .imp { grid-column: 1 / -1; border: 1px solid var(--line); background: var(--paper); }
+  .imp-head { padding: 12px var(--space-4); border-bottom: 1px solid var(--line); background: var(--surface); }
+  .imp-label { font-size: 14px; font-weight: 700; }
+  .imp-engines { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: 12px var(--space-4); border-bottom: 1px solid var(--line); }
+  .imp-engines button { font: 500 13px/20px var(--font-sans); padding: 4px 10px; cursor: pointer; background: var(--surface); color: var(--ink); border: 1px solid var(--ink-muted); border-radius: var(--radius-sm); }
+  .imp-engines button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+  .imp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .imp-table th { text-align: left; font-weight: 700; color: var(--ink-muted); font-size: 13px; padding: 8px var(--space-4); border-bottom: 1px solid var(--line); }
+  .imp-table td { padding: 10px var(--space-4); border-bottom: 1px solid var(--line); vertical-align: top; }
+  .imp-table tr:last-child td { border-bottom: 0; }
+  .imp-table code { font: 400 13px/20px var(--font-mono); overflow-wrap: anywhere; }
+  .imp-table td:last-child code { color: var(--brand); }
+
+  @media (max-width: 760px) {
+    .imp-table thead { display: none; }
+    .imp-table tr { display: block; padding: 10px var(--space-4); border-bottom: 1px solid var(--line); }
+    .imp-table td { display: block; padding: 2px 0; border: 0; }
+  }
+</style>
+
+<script>
+  // Filtrer le tableau par moteur
+  for (const root of document.querySelectorAll<HTMLElement>('[data-imperium]')) {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const rows = [...root.querySelectorAll<HTMLTableRowElement>('tbody tr')];
+
+    const show = (engine: string) => {
+      for (const b of buttons) b.setAttribute('aria-selected', String(b.dataset.engine === engine));
+      for (const r of rows) r.hidden = r.dataset.engine !== engine;
+    };
+
+    for (const b of buttons) b.addEventListener('click', () => show(b.dataset.engine ?? ''));
+  }
+</script>

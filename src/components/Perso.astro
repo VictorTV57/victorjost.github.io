@@ -1,0 +1,129 @@
+---
+import { favoriteFilms, favoriteGames, nowPlaying, playlist, spotifyUrl, steamUrl } from '../data/perso';
+
+const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
+---
+<div class="perso-block reveal">
+  <h3 class="cat-title">Mes jeux du moment</h3>
+  <ul class="now-playing">
+    {nowPlaying.map((game) => (
+      <li>
+        <span class="cover" style={swatch(game)} aria-hidden="true"></span>
+        <div class="np-info">
+          <strong>{game.title}</strong>
+          <span class="muted">{game.info}</span>
+          {game.achievements && (
+            <span
+              class="bar"
+              style={`--p:${Math.round((game.achievements.done / game.achievements.total) * 100)}%`}
+              role="img"
+              aria-label={`Succès : ${game.achievements.done} sur ${game.achievements.total}`}
+            ></span>
+          )}
+        </div>
+        <span class="np-time">
+          {game.achievements ? `${game.achievements.done} / ${game.achievements.total} succès` : game.time}
+        </span>
+      </li>
+    ))}
+  </ul>
+  <a class="more-link" href={steamUrl} target="_blank" rel="noopener">Mon profil Steam <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+</div>
+
+<div class="perso-block reveal">
+  <h3 class="cat-title">Mes jeux préférés</h3>
+  <ol class="covers">
+    {favoriteGames.map((game, i) => (
+      <li>
+        <span class="poster" style={swatch(game)} aria-hidden="true"><span class="rank">{i + 1}</span></span>
+        <strong>{game.title}</strong>
+        <span class="muted">{game.info}</span>
+      </li>
+    ))}
+  </ol>
+</div>
+
+<div class="perso-block reveal">
+  <h3 class="cat-title">Mes films préférés</h3>
+  <ul class="covers films">
+    {favoriteFilms.map((film) => (
+      <li>
+        <span class="poster" style={swatch(film)} aria-hidden="true"></span>
+        <strong>{film.title}</strong>
+        <span class="muted">{film.info}</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<div class="perso-block reveal">
+  <h3 class="cat-title">Sur mon Spotify</h3>
+  <div class="playlist">
+    <div class="pl-head">
+      <span class="pl-cover" aria-hidden="true"></span>
+      <div>
+        <strong>{playlist.name}</strong>
+        <span class="muted">{playlist.description}</span>
+      </div>
+    </div>
+    <ol class="tracks">
+      {playlist.tracks.map((track, i) => (
+        <li>
+          <span class="t-num">{i + 1}</span>
+          <span class="t-name"><strong>{track.title}</strong><span class="muted">{track.artist}</span></span>
+          <span class="t-len">{track.length}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+  <a class="more-link" href={spotifyUrl} target="_blank" rel="noopener">Écouter sur Spotify <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+</div>
+
+<style>
+  .perso-block { margin-bottom: var(--space-12); }
+  .perso-block:last-child { margin-bottom: 0; }
+  .more-link { margin-top: var(--space-4); display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; text-decoration: none; }
+  .more-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .more-link svg { width: 14px; height: 14px; }
+
+  /* Visuels provisoires : à remplacer par de vraies jaquettes (<img>) */
+  .cover, .poster, .pl-cover { display: block; background: linear-gradient(135deg, var(--c1) 0 50%, var(--c2) 50% 100%); }
+
+  .now-playing { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); }
+  .now-playing li { display: grid; grid-template-columns: 48px 1fr auto; gap: var(--space-4); align-items: center; padding: var(--space-4); border-bottom: 1px solid var(--line); }
+  .now-playing li:last-child { border-bottom: 0; }
+  .now-playing .cover { width: 48px; height: 48px; }
+  .np-info { display: flex; flex-direction: column; min-width: 0; }
+  .np-info .muted { font-size: 14px; }
+  .np-time { font-size: 14px; color: var(--ink-muted); white-space: nowrap; }
+  .bar { margin-top: 6px; height: 4px; background: var(--line); position: relative; max-width: 200px; }
+  .bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--p); background: var(--brand); }
+
+  .covers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+  .covers.films { grid-template-columns: repeat(5, 1fr); }
+  .covers li { display: flex; flex-direction: column; min-width: 0; }
+  .covers .poster { position: relative; aspect-ratio: 3 / 4; border: 1px solid var(--line); margin-bottom: var(--space-2); }
+  .covers.films .poster { aspect-ratio: 2 / 3; }
+  .covers strong { font-size: 15px; line-height: 20px; }
+  .covers .muted { font-size: 13px; line-height: 18px; }
+  .rank { position: absolute; left: 0; bottom: 0; background: var(--surface); color: var(--ink); font-weight: 800; font-size: 20px; width: 36px; height: 36px; display: grid; place-items: center; }
+
+  .playlist { background: var(--ink); color: var(--surface); padding: var(--space-6); }
+  .pl-head { display: flex; align-items: center; gap: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--ink-line); }
+  .pl-head > div { display: flex; flex-direction: column; }
+  .pl-cover { width: 64px; height: 64px; --c1: var(--brand); --c2: var(--accent); flex-shrink: 0; }
+  .playlist .muted { color: var(--ink-soft); font-size: 14px; }
+  .tracks { list-style: none; margin: 0; padding: 0; }
+  .tracks li { display: grid; grid-template-columns: 24px 1fr auto; gap: var(--space-4); align-items: center; padding: 10px 0; border-bottom: 1px solid var(--ink-line); }
+  .tracks li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .t-num, .t-len { color: var(--ink-soft); font-size: 14px; }
+  .t-name { display: flex; flex-direction: column; min-width: 0; }
+  .t-name strong { font-weight: 500; }
+
+  @media (max-width: 560px) {
+    .covers { grid-template-columns: repeat(2, 1fr); }
+    .covers.films { grid-template-columns: repeat(3, 1fr); }
+    .now-playing li { grid-template-columns: 48px 1fr; }
+    .np-time { grid-column: 2; }
+  }
+</style>

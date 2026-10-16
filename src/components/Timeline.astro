@@ -1,0 +1,30 @@
+---
+import type { Step } from '../data/parcours';
+
+interface Props {
+  items: Step[];
+}
+
+const { items } = Astro.props;
+---
+<ol class="timeline">
+  {items.map((step) => (
+    <li class:list={['reveal', { now: step.now }]}>
+      <span class="when">{step.when}</span>
+      <h3>{step.title}</h3>
+      <p>{step.text}</p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+  .timeline::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+  li { position: relative; padding: 0 0 var(--space-6) 40px; }
+  li:last-child { padding-bottom: 0; }
+  li::before { content: ""; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; background: var(--surface); border: 2px solid var(--brand); }
+  li.now::before { background: var(--brand); }
+  .when { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
+  h3 { margin: 2px 0 0; font-size: 18px; line-height: 24px; }
+  p { margin: 4px 0 0; color: var(--ink-muted); }
+</style>

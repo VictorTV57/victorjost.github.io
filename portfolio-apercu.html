@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Victor Jost — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  /* Tokens — design system « Victor Jost » */
+  :root {
+    --paper:#F3F5F8; --surface:#FFFFFF; --line:#DCE2EA;
+    --ink:#0E1A2B; --ink-muted:#56637A;
+    --brand:#1F4FE0; --on-brand:#FFFFFF; --accent:#F5B800;
+    --success:#1B7F4B; --danger:#C42F28;
+    --space-2:8px; --space-4:16px; --space-6:24px; --space-12:48px;
+    --radius-0:0; --radius-sm:2px; --radius-md:4px;
+    --font-sans:"Archivo", system-ui, sans-serif;
+    --font-mono:"JetBrains Mono", ui-monospace, monospace;
+    /* Tons dérivés pour la colonne sombre */
+    --ink-line:#2A3A52; --ink-text:#C3CCDA; --ink-soft:#8E9BB0; --brand-light:#8FA8F5;
+    interpolate-size:allow-keywords;
+  }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  html { scroll-behavior:smooth; }
+  body {
+    margin:0; font:400 16px/24px var(--font-sans); color:var(--ink);
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:24px 24px;
+  }
+  a { color:var(--brand); }
+  :focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+  .side :focus-visible { outline-color:var(--brand-light); }
+
+  /* Effet signature : les cases de la grille s'allument sous la souris */
+  #grid-glow { position:fixed; inset:0; pointer-events:none; z-index:0; }
+
+  /* Barre de progression de lecture */
+  .progress { position:fixed; left:0; right:0; bottom:0; height:3px; background:var(--accent); transform-origin:left; transform:scaleX(0); z-index:20; }
+  @supports (animation-timeline: scroll()) {
+    .progress { animation:progress linear both; animation-timeline:scroll(root); }
+  }
+  @keyframes progress { to { transform:scaleX(1); } }
+
+  /* ===== Disposition deux colonnes ===== */
+  .layout { position:relative; z-index:1; display:grid; grid-template-columns:minmax(360px, 5fr) 7fr; min-height:100vh; }
+
+  /* Colonne gauche fixe */
+  .side { background:var(--ink); color:var(--surface); }
+  .side-inner {
+    position:sticky; top:0; height:100vh; padding:72px 48px 48px;
+    display:flex; flex-direction:column;
+    max-width:520px; margin-left:auto;
+  }
+  .monogram { width:48px; height:48px; background:var(--brand); color:var(--on-brand); display:grid; place-items:center; font-weight:800; font-size:18px; }
+  .side h1 { margin:var(--space-6) 0 0; font-size:64px; line-height:.95; font-weight:800; letter-spacing:-.03em; }
+  .side h1 span { display:block; color:var(--brand-light); }
+  .pitch { margin:var(--space-4) 0 0; max-width:36ch; color:var(--ink-text); font-size:17px; line-height:26px; }
+  .badge { margin-top:var(--space-6); display:inline-flex; align-items:center; gap:10px; align-self:flex-start; font-size:14px; font-weight:500; color:var(--surface); border:1px solid var(--ink-line); padding:6px 12px; border-radius:var(--radius-sm); }
+  .dot { position:relative; width:8px; height:8px; background:var(--accent); }
+  .dot::after { content:""; position:absolute; inset:0; background:var(--accent); animation:ping 1.6s cubic-bezier(0,0,.2,1) infinite; }
+  @keyframes ping { 75%, 100% { transform:scale(2.4); opacity:0; } }
+  .actions { margin-top:var(--space-6); display:flex; gap:var(--space-2); flex-wrap:wrap; }
+
+  .btn {
+    display:inline-flex; align-items:center; gap:var(--space-2); white-space:nowrap; flex-shrink:0;
+    font:700 14px/20px var(--font-sans); padding:10px 16px; border-radius:var(--radius-sm); text-decoration:none;
+    background:var(--brand); color:var(--on-brand); border:1px solid var(--brand);
+    transition:background-color .15s;
+  }
+  .btn:hover { background:#1A43C2; }
+  .btn.ghost { background:transparent; color:var(--surface); border-color:var(--ink-soft); }
+  .btn.ghost:hover { border-color:var(--surface); background:transparent; }
+  .btn svg { width:18px; height:18px; }
+
+  /* Sommaire avec section active */
+  .toc { margin-top:var(--space-12); }
+  .toc ol { list-style:none; margin:0; padding:0; display:grid; gap:4px; }
+  .toc a { display:flex; align-items:center; gap:var(--space-4); padding:6px 0; color:var(--ink-soft); text-decoration:none; font-size:14px; font-weight:500; }
+  .toc a::before { content:""; width:24px; height:1px; background:var(--ink-soft); transition:width .25s, background-color .25s; }
+  .toc a:hover { color:var(--surface); }
+  .toc a.current { color:var(--surface); }
+  .toc a.current::before { width:72px; height:2px; background:var(--accent); }
+
+  .socials { margin-top:auto; padding-top:var(--space-6); display:flex; gap:var(--space-4); border-top:1px solid var(--ink-line); }
+  .socials a { color:var(--ink-text); display:inline-flex; }
+  .socials a:hover { color:var(--surface); }
+  .socials svg { width:22px; height:22px; }
+
+  /* Entrée en cascade de la colonne gauche */
+  @media (prefers-reduced-motion:no-preference) {
+    .in { opacity:0; transform:translateY(10px); animation:in .7s cubic-bezier(.16,1,.3,1) forwards; animation-delay:calc(var(--i, 0) * 90ms); }
+    @keyframes in { to { opacity:1; transform:none; } }
+  }
+
+  /* Colonne droite */
+  .content { padding:72px 48px 96px; }
+  .content-inner { max-width:680px; }
+  section { padding-bottom:var(--space-12); margin-bottom:var(--space-12); border-bottom:1px solid var(--line); scroll-margin-top:48px; }
+  section:last-child { border-bottom:0; margin-bottom:0; }
+  h2 { margin:0 0 var(--space-6); font-size:36px; line-height:40px; font-weight:700; letter-spacing:-.01em; display:flex; align-items:center; gap:var(--space-4); }
+  h2::before { content:""; width:12px; height:12px; background:var(--brand); flex-shrink:0; }
+  .prose p { margin:0 0 var(--space-4); max-width:62ch; }
+  .prose p:last-child { margin-bottom:0; }
+  .muted { color:var(--ink-muted); }
+
+  /* Apparition au défilement, CSS pur */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion:no-preference) {
+      .reveal { animation:reveal linear both; animation-timeline:view(); animation-range:entry 0% entry 60%; }
+      @keyframes reveal { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+    }
+  }
+
+  /* Catégories de projets */
+  .cat { margin-bottom:var(--space-12); }
+  .cat:last-child { margin-bottom:0; }
+  .cat-title { margin:0 0 var(--space-4); font-size:14px; font-weight:700; color:var(--ink-muted); display:flex; align-items:center; gap:var(--space-2); }
+  .cat-title::after { content:""; flex:1; height:1px; background:var(--line); }
+
+  .project {
+    display:grid; grid-template-columns:96px 1fr; gap:var(--space-6);
+    background:var(--surface); border:1px solid var(--line); padding:var(--space-6);
+    transition:border-color .15s;
+  }
+  .project + .project { margin-top:var(--space-4); }
+  .project:hover { border-color:var(--ink-muted); }
+  .thumb { width:96px; height:96px; border:1px solid var(--line); overflow:hidden; }
+  .thumb svg { display:block; width:100%; height:100%; }
+  .project h3 { margin:0; font-size:20px; line-height:26px; font-weight:700; }
+  .kind { font-size:14px; color:var(--ink-muted); margin-top:2px; }
+  .project p { margin:var(--space-2) 0 0; }
+  .meta { margin-top:var(--space-4); display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap; }
+  .tags { display:flex; flex-wrap:wrap; gap:var(--space-2); list-style:none; margin:0; padding:0; }
+  .tags li { font:400 13px/20px var(--font-mono); padding:2px 8px; border:1px solid var(--line); border-radius:var(--radius-sm); color:var(--ink-muted); background:var(--paper); }
+  .code-link { display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:14px; text-decoration:none; color:var(--brand); white-space:nowrap; }
+  .code-link:hover { text-decoration:underline; text-underline-offset:3px; }
+  .code-link svg { width:18px; height:18px; }
+  .private { font-size:14px; color:var(--ink-muted); display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+  .private svg { width:16px; height:16px; }
+  .status { font-size:13px; color:var(--ink-muted); display:inline-flex; align-items:center; gap:6px; margin-top:var(--space-2); }
+  .status::before { content:""; width:8px; height:8px; background:var(--success); }
+
+  /* Repli « Voir d'autres projets » */
+  .fold { margin-top:var(--space-4); }
+  .fold summary {
+    list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:var(--space-2);
+    font:500 14px/20px var(--font-sans); color:var(--ink); padding:6px 12px;
+    background:var(--surface); border:1px solid var(--ink-muted); border-radius:var(--radius-sm);
+  }
+  .fold summary::-webkit-details-marker { display:none; }
+  .fold summary:hover { border-color:var(--ink); }
+  .fold summary svg { width:16px; height:16px; transition:transform .25s; }
+  .fold[open] summary svg { transform:rotate(180deg); }
+  .fold .when-open { display:none; }
+  .fold[open] .when-open { display:inline; }
+  .fold[open] .when-closed { display:none; }
+  .fold-body { padding-top:var(--space-4); }
+  .fold::details-content { block-size:0; overflow:hidden; transition:block-size .45s cubic-bezier(.16,1,.3,1), content-visibility .45s allow-discrete; }
+  .fold[open]::details-content { block-size:auto; }
+
+  /* Parcours en frise */
+  .timeline { list-style:none; margin:0; padding:0; position:relative; }
+  .timeline::before { content:""; position:absolute; left:5px; top:8px; bottom:8px; width:2px; background:var(--line); }
+  .timeline li { position:relative; padding:0 0 var(--space-6) 40px; }
+  .timeline li:last-child { padding-bottom:0; }
+  .timeline li::before { content:""; position:absolute; left:0; top:6px; width:12px; height:12px; background:var(--surface); border:2px solid var(--brand); }
+  .timeline li.now::before { background:var(--brand); }
+  .when { font-size:14px; font-weight:700; color:var(--ink-muted); }
+  .timeline h3 { margin:2px 0 0; font-size:18px; line-height:24px; }
+  .timeline p { margin:4px 0 0; color:var(--ink-muted); }
+
+  /* Compétences */
+  .skills { display:grid; grid-template-columns:repeat(2, 1fr); gap:var(--space-4); }
+  .skill-box { background:var(--surface); border:1px solid var(--line); padding:var(--space-6); }
+  .skill-box h3 { margin:0 0 var(--space-4); font-size:16px; }
+
+  /* Contact */
+  .contact-box { background:var(--ink); color:var(--surface); padding:var(--space-12) var(--space-6); }
+  .contact-box h2 { color:var(--surface); font-size:40px; line-height:44px; font-weight:800; }
+  .contact-box h2::before { background:var(--accent); }
+  .contact-box p { color:var(--ink-text); margin:0 0 var(--space-6); max-width:52ch; }
+  .contact-box .actions { margin-top:0; }
+
+  /* En dehors du code */
+  .perso-intro { margin:calc(-1 * var(--space-2)) 0 var(--space-12); }
+  .perso-block { margin-bottom:var(--space-12); }
+  .perso-block:last-child { margin-bottom:0; }
+  .more-link { margin-top:var(--space-4); display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; text-decoration:none; }
+  .more-link:hover { text-decoration:underline; text-underline-offset:3px; }
+  .more-link svg { width:14px; height:14px; }
+
+  /* Visuels provisoires : à remplacer par de vraies jaquettes (<img>) */
+  .cover, .poster, .pl-cover { display:block; background:linear-gradient(135deg, var(--c1) 0 50%, var(--c2) 50% 100%); }
+
+  .now-playing { list-style:none; margin:0; padding:0; background:var(--surface); border:1px solid var(--line); }
+  .now-playing li { display:grid; grid-template-columns:48px 1fr auto; gap:var(--space-4); align-items:center; padding:var(--space-4); border-bottom:1px solid var(--line); }
+  .now-playing li:last-child { border-bottom:0; }
+  .now-playing .cover { width:48px; height:48px; }
+  .np-info { display:flex; flex-direction:column; min-width:0; }
+  .np-info .muted { font-size:14px; }
+  .np-time { font-size:14px; color:var(--ink-muted); white-space:nowrap; }
+  .bar { margin-top:6px; height:4px; background:var(--line); position:relative; max-width:200px; }
+  .bar::after { content:""; position:absolute; inset:0 auto 0 0; width:var(--p); background:var(--brand); }
+
+  .covers { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, 1fr); gap:var(--space-4); }
+  .covers.films { grid-template-columns:repeat(5, 1fr); }
+  .covers li { display:flex; flex-direction:column; min-width:0; }
+  .covers .poster { position:relative; aspect-ratio:3 / 4; border:1px solid var(--line); margin-bottom:var(--space-2); }
+  .covers.films .poster { aspect-ratio:2 / 3; }
+  .covers strong { font-size:15px; line-height:20px; }
+  .covers .muted { font-size:13px; line-height:18px; }
+  .rank { position:absolute; left:0; bottom:0; background:var(--surface); color:var(--ink); font-weight:800; font-size:20px; width:36px; height:36px; display:grid; place-items:center; }
+
+  .playlist { background:var(--ink); color:var(--surface); padding:var(--space-6); }
+  .pl-head { display:flex; align-items:center; gap:var(--space-4); padding-bottom:var(--space-4); border-bottom:1px solid var(--ink-line); }
+  .pl-head > div { display:flex; flex-direction:column; }
+  .pl-cover { width:64px; height:64px; --c1:var(--brand); --c2:var(--accent); flex-shrink:0; }
+  .playlist .muted { color:var(--ink-soft); font-size:14px; }
+  .tracks { list-style:none; margin:0; padding:0; }
+  .tracks li { display:grid; grid-template-columns:24px 1fr auto; gap:var(--space-4); align-items:center; padding:10px 0; border-bottom:1px solid var(--ink-line); }
+  .tracks li:last-child { border-bottom:0; padding-bottom:0; }
+  .t-num, .t-len { color:var(--ink-soft); font-size:14px; }
+  .t-name { display:flex; flex-direction:column; min-width:0; }
+  .t-name strong { font-weight:500; }
+
+  @media (max-width:560px) {
+    .covers { grid-template-columns:repeat(2, 1fr); }
+    .covers.films { grid-template-columns:repeat(3, 1fr); }
+    .now-playing li { grid-template-columns:48px 1fr; }
+    .np-time { grid-column:2; }
+  }
+
+  /* Imperium : explorateur d'implémentations */
+  .imp { grid-column:1 / -1; margin-top:0; border:1px solid var(--line); background:var(--paper); }
+  .imp-head { padding:12px var(--space-4); border-bottom:1px solid var(--line); background:var(--surface); }
+  .imp-label { font-size:14px; font-weight:700; }
+  .imp-engines { display:flex; flex-wrap:wrap; gap:var(--space-2); padding:12px var(--space-4); border-bottom:1px solid var(--line); }
+  .imp-engines button { font:500 13px/20px var(--font-sans); padding:4px 10px; cursor:pointer; background:var(--surface); color:var(--ink); border:1px solid var(--ink-muted); border-radius:var(--radius-sm); }
+  .imp-engines button[aria-selected="true"] { background:var(--ink); border-color:var(--ink); color:var(--surface); }
+  .imp-table { width:100%; border-collapse:collapse; font-size:14px; }
+  .imp-table th { text-align:left; font-weight:700; color:var(--ink-muted); font-size:13px; padding:8px var(--space-4); border-bottom:1px solid var(--line); }
+  .imp-table td { padding:10px var(--space-4); border-bottom:1px solid var(--line); vertical-align:top; }
+  .imp-table tr:last-child td { border-bottom:0; }
+  .imp-table code { font:400 13px/20px var(--font-mono); overflow-wrap:anywhere; }
+  .imp-table td:last-child code { color:var(--brand); }
+  .imp-table tr[hidden] { display:none; }
+
+  .skill-sub { margin:var(--space-4) 0 var(--space-2); font-size:13px; color:var(--ink-muted); font-weight:700; }
+  .skills .langs { grid-column:1 / -1; }
+  .langs dl { margin:0; display:grid; grid-template-columns:repeat(2, 1fr); gap:var(--space-4); }
+  .langs dt { font-weight:700; }
+  .langs dd { margin:2px 0 0; color:var(--ink); }
+
+  /* Pages photos */
+  .subpage { position:relative; z-index:1; min-height:100vh; }
+  .sub-inner { max-width:1040px; margin:0 auto; padding:48px 48px 96px; }
+  .back { display:inline-flex; align-items:center; gap:var(--space-2); font-weight:700; font-size:14px; text-decoration:none; padding:8px 12px; background:var(--surface); border:1px solid var(--ink-muted); border-radius:var(--radius-sm); color:var(--ink); }
+  .back:hover { border-color:var(--ink); }
+  .back svg { width:16px; height:16px; }
+  .sub-head { margin:var(--space-12) 0; max-width:680px; }
+  .sub-kind { font-size:14px; font-weight:700; color:var(--ink-muted); }
+  .sub-head h1 { margin:var(--space-2) 0 var(--space-4); font-size:56px; line-height:56px; font-weight:800; letter-spacing:-.02em; }
+  .sub-head p { margin:0 0 var(--space-4); }
+  .sub-note { display:flex; align-items:center; gap:var(--space-2); color:var(--ink-muted); font-size:14px; margin-top:var(--space-4) !important; }
+  .sub-note svg { width:16px; height:16px; flex-shrink:0; }
+  .gallery { display:grid; grid-template-columns:repeat(3, 1fr); gap:var(--space-6); }
+  .ph { margin:0; background:var(--surface); border:1px solid var(--line); }
+  .ph.big { grid-column:span 2; grid-row:span 2; }
+  .ph.wide { grid-column:1 / -1; }
+  .ph-img { display:block; aspect-ratio:4 / 3; background:
+      linear-gradient(135deg, transparent 49.6%, var(--line) 49.6% 50.4%, transparent 50.4%),
+      linear-gradient(45deg, transparent 49.6%, var(--line) 49.6% 50.4%, transparent 50.4%), var(--paper); }
+  .ph.big .ph-img { aspect-ratio:auto; height:calc(100% - 45px); min-height:240px; }
+  .ph.wide .ph-img { aspect-ratio:21 / 8; }
+  .ph figcaption { padding:12px var(--space-4); font-size:14px; color:var(--ink-muted); border-top:1px solid var(--line); }
+  @media (prefers-reduced-motion:no-preference) {
+    .subpage:not([hidden]) .sub-inner { animation:in .5s cubic-bezier(.16,1,.3,1); }
+  }
+  @media (max-width:760px) {
+    .sub-inner { padding:24px 16px 72px; }
+    .sub-head h1 { font-size:40px; line-height:44px; }
+    .gallery { grid-template-columns:1fr 1fr; gap:var(--space-4); }
+    .ph.big { grid-column:1 / -1; grid-row:auto; }
+    .ph.big .ph-img { height:auto; aspect-ratio:4 / 3; }
+    .langs dl { grid-template-columns:1fr; }
+    .imp-table thead { display:none; }
+    .imp-table tr { display:block; padding:10px var(--space-4); border-bottom:1px solid var(--line); }
+    .imp-table td { display:block; padding:2px 0; border:0; }
+  }
+
+  /* Hackathons */
+  .hacks { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2, 1fr); gap:var(--space-4); }
+  .hack { background:var(--surface); border:1px solid var(--line); padding:var(--space-6); display:flex; flex-direction:column; gap:4px; }
+  .hack-date { font-size:14px; font-weight:700; color:var(--ink-muted); }
+  .hack h3 { margin:0; font-size:18px; line-height:24px; }
+  .hack p { margin:4px 0 0; }
+  .hack-result { margin-top:auto; padding-top:var(--space-4); align-self:flex-start; font-size:13px; font-weight:700; }
+  .hack-result::before { content:""; display:inline-block; width:8px; height:8px; background:var(--accent); margin-right:8px; }
+  @media (max-width:560px) { .hacks { grid-template-columns:1fr; } }
+
+  footer { margin-top:var(--space-12); font-size:14px; color:var(--ink-muted); }
+
+  /* ===== Responsive ===== */
+  @media (max-width:960px) {
+    .layout { grid-template-columns:1fr; }
+    .side-inner { position:static; height:auto; max-width:none; margin:0; padding:48px 24px; }
+    .side h1 { font-size:52px; }
+    .toc { display:none; }
+    .socials { margin-top:var(--space-6); }
+    .content { padding:48px 24px 72px; }
+  }
+  @media (max-width:560px) {
+    .side-inner, .content { padding-left:16px; padding-right:16px; }
+    .project { grid-template-columns:1fr; gap:var(--space-4); }
+    .thumb { width:100%; height:120px; }
+    .thumb svg { width:100%; }
+    .skills { grid-template-columns:1fr; }
+    .contact-box { padding:32px 16px; }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    html { scroll-behavior:auto; }
+    .dot::after { animation:none; }
+    .progress { display:none; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="gh" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></g></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></g></symbol>
+  <symbol id="in" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><rect x="3" y="3" width="18" height="18"/><path d="M8 10v7M8 7v.01M12 17v-7M12 13a3 3 0 0 1 6 0v4"/></g></symbol>
+  <symbol id="camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></g></symbol>
+  <symbol id="back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></symbol>
+</svg>
+
+<canvas id="grid-glow" aria-hidden="true"></canvas>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="layout" id="home">
+  <!-- ===== Colonne gauche ===== -->
+  <aside class="side">
+    <div class="side-inner">
+      <div class="monogram in" style="--i:0" aria-hidden="true">VJ</div>
+      <h1 class="in" style="--i:1">Victor<span>Jost</span></h1>
+      <p class="pitch in" style="--i:2">Étudiant développeur en 3e année à EPITECH Nancy. Applis, sites, systèmes de jeu et une voiture qui roule toute seule.</p>
+      <!-- Badge de disponibilité : à adapter (ex. « Recherche un stage de X mois, à partir de ... ») -->
+      <span class="badge in" style="--i:3"><span class="dot" aria-hidden="true"></span>Ta disponibilité ici</span>
+      <div class="actions in" style="--i:4">
+        <a class="btn" href="https://github.com/VictorTV57" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh"/></svg>Voir mon GitHub</a>
+        <a class="btn ghost" href="#contact">Me contacter</a>
+      </div>
+
+      <nav class="toc in" style="--i:5" aria-label="Sommaire">
+        <ol>
+          <li><a href="#a-propos" data-nav>À propos</a></li>
+          <li><a href="#projets" data-nav>Projets</a></li>
+          <li><a href="#hackathons" data-nav>Hackathons</a></li>
+          <li><a href="#contact" data-nav>Contact</a></li>
+          <li><a href="#experience" data-nav>Expérience</a></li>
+          <li><a href="#formation" data-nav>Formation</a></li>
+          <li><a href="#competences" data-nav>Compétences</a></li>
+          <li><a href="#perso" data-nav>En dehors du code</a></li>
+        </ol>
+      </nav>
+
+      <div class="socials in" style="--i:6">
+        <a href="https://github.com/VictorTV57" target="_blank" rel="noopener" aria-label="GitHub"><svg aria-hidden="true"><use href="#gh"/></svg></a>
+        <a href="https://www.linkedin.com/in/victor-jost" target="_blank" rel="noopener" aria-label="LinkedIn"><svg aria-hidden="true"><use href="#in"/></svg></a>
+        <a href="mailto:victor.jost@epitech.eu" aria-label="E-mail"><svg aria-hidden="true"><use href="#mail"/></svg></a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Colonne droite ===== -->
+  <main class="content">
+    <div class="content-inner">
+
+      <section id="a-propos">
+        <h2>À propos</h2>
+        <div class="prose reveal">
+          <p>Tout a commencé très jeune, manette en main. À force de jouer, je me suis demandé ce qui se passait derrière l'écran : comment fonctionne un ordinateur, comment un programme prend vie. Cette curiosité ne m'a pas quitté.</p>
+          <p>Aujourd'hui je suis en 3e année à EPITECH Nancy, avec un profil de développeur généraliste : du C# et .NET en entreprise, du Python sur une voiture autonome, du TypeScript pour le web, et Imperium, une suite de systèmes de jeu que je porte sur une douzaine de moteurs et de langages. J'ai aussi fait un stage de 4 mois chez ONYX Informatique, à Yutz, et je m'occupe d'EpiClutch, l'association jeu vidéo de l'école.</p>
+          <p>Loin du clavier, je marche, je randonne avec les Scouts Unitaires de France, je fais du vélo, et chaque mardi soir je cours avec le BlaBlaRunClub à Nancy.</p>
+        </div>
+      </section>
+
+      <section id="projets">
+        <h2>Projets</h2>
+        <!--
+          ORDRE DES PROJETS : chaque projet a un data-order (1 = en haut).
+          Dans chaque catégorie, le plus petit numéro s'affiche, les autres vont dans le repli.
+          Dans Astro, ce sera un champ « order » dans le fichier de chaque projet.
+        -->
+
+        <!-- Catégorie : EPITECH -->
+        <div class="cat">
+          <h3 class="cat-title">Projets EPITECH</h3>
+          <article class="project" data-order="1">
+            <div class="thumb" aria-hidden="true">
+              <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#0E1A2B"/><path d="M22 96 44 0M74 96 52 0" stroke="#F3F5F8" stroke-width="3"/><rect x="36" y="56" width="24" height="24" fill="#1F4FE0"/><rect x="44" y="50" width="8" height="6" fill="#F5B800"/></svg>
+            </div>
+            <div>
+              <h3>Robocar</h3>
+              <div class="kind">Projet pédagogique national</div>
+              <p>Une voiture RC autonome qui suit deux lignes blanches. Modèle d'IA en Python, Jetson Nano, câblage, soudure et pièces imprimées en 3D.</p>
+              <div class="meta">
+                <ul class="tags"><li>Python</li><li>IA</li><li>Jetson Nano</li><li>Impression 3D</li></ul>
+                <a class="code-link" href="#/robocar"><svg aria-hidden="true"><use href="#camera"/></svg>Voir les photos</a>
+              </div>
+            </div>
+          </article>
+          <details class="fold">
+            <summary><span class="when-closed">Voir les autres projets</span><span class="when-open">Masquer</span><svg aria-hidden="true"><use href="#chev"/></svg></summary>
+            <div class="fold-body">
+              <article class="project" data-order="2">
+                <div class="thumb" aria-hidden="true">
+                  <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#1F4FE0"/><rect y="30" width="96" height="3" fill="#F3F5F8"/><rect y="63" width="96" height="3" fill="#F3F5F8"/><rect x="10" y="40" width="40" height="16" fill="#0E1A2B"/><rect x="54" y="72" width="32" height="14" fill="#F5B800"/></svg>
+                </div>
+                <div>
+                  <h3>House Scoreboard</h3>
+                  <div class="kind">Projet scolaire</div>
+                  <p>Saisie des temps de natation et calcul automatique des points selon le barème du professeur, avec l'historique des compétitions.</p>
+                  <div class="meta">
+                    <ul class="tags"><li>TypeScript</li><li>Node.js</li><li>Vite</li></ul>
+                    <a class="code-link" href="#/house-scoreboard"><svg aria-hidden="true"><use href="#camera"/></svg>Voir les photos</a>
+                  </div>
+                </div>
+              </article>
+              <article class="project" data-order="4">
+                <div class="thumb" aria-hidden="true">
+                  <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#F3F5F8"/><g fill="#DCE2EA"><rect x="8" y="8" width="24" height="24"/><rect x="36" y="8" width="24" height="24"/><rect x="64" y="8" width="24" height="24"/><rect x="8" y="36" width="24" height="24"/><rect x="64" y="36" width="24" height="24"/><rect x="8" y="64" width="24" height="24"/><rect x="36" y="64" width="24" height="24"/><rect x="64" y="64" width="24" height="24"/></g><rect x="36" y="36" width="24" height="24" fill="#1F4FE0"/><rect x="44" y="72" width="8" height="8" fill="#F5B800"/><rect x="72" y="16" width="8" height="8" fill="#0E1A2B"/></svg>
+                </div>
+                <div>
+                  <h3>Zappy</h3>
+                  <div class="kind">Projet de fin d'année</div>
+                  <p>Un monde virtuel en réseau : un serveur qui fait tourner la simulation, des IA autonomes qui s'y connectent pour survivre et évoluer, et un client graphique pour suivre la partie.</p>
+                  <div class="meta">
+                    <ul class="tags"><li>C</li><li>C++</li><li>Réseau</li><li>IA</li></ul>
+                    <span class="private"><svg aria-hidden="true"><use href="#gh"/></svg>Dépôt à venir</span>
+                  </div>
+                </div>
+              </article>
+              <article class="project" data-order="5">
+                <div class="thumb" aria-hidden="true">
+                  <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#0E1A2B"/><circle cx="56" cy="50" r="24" fill="#1F4FE0"/><circle cx="48" cy="42" r="7" fill="#8FA8F5"/><path d="M0 84h96" stroke="#56637A" stroke-width="2"/><path d="M8 8 56 50" stroke="#F5B800" stroke-width="2"/><rect x="4" y="4" width="8" height="8" fill="#F5B800"/></svg>
+                </div>
+                <div>
+                  <h3>Raytracer</h3>
+                  <div class="kind">Projet EPITECH</div>
+                  <p>Un moteur de rendu 3D par lancer de rayons : primitives, matériaux, lumières, ombres et réflexions, décrits dans un fichier de scène.</p>
+                  <div class="meta">
+                    <ul class="tags"><li>C++</li><li>Rendu 3D</li></ul>
+                    <span class="private"><svg aria-hidden="true"><use href="#gh"/></svg>Dépôt à venir</span>
+                  </div>
+                </div>
+              </article>
+              <article class="project" data-order="3">
+                <div class="thumb" aria-hidden="true">
+                  <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#DCE2EA"/><rect x="20" y="20" width="56" height="56" fill="#FFFFFF" stroke="#0E1A2B"/><rect x="32" y="32" width="32" height="32" fill="#1F4FE0"/><rect x="44" y="44" width="8" height="8" fill="#F5B800"/></svg>
+                </div>
+                <div>
+                  <h3>Sensai</h3>
+                  <div class="kind">Projet EPITECH</div>
+                  <p>Un chatbot qui tourne en local grâce à Ollama : on discute avec un modèle de langage sans envoyer ses données dans le cloud.</p>
+                  <div class="meta">
+                    <ul class="tags"><li>Python</li><li>Ollama</li><li>LLM</li></ul>
+                    <span class="private"><svg aria-hidden="true"><use href="#gh"/></svg>Dépôt à venir</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </details>
+        </div>
+
+        <!-- Catégorie : perso -->
+        <div class="cat">
+          <h3 class="cat-title">Projets perso</h3>
+          <article class="project" data-order="1">
+            <div class="thumb" aria-hidden="true">
+              <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#F3F5F8"/><rect x="16" y="72" width="64" height="8" fill="#0E1A2B"/><rect x="22" y="32" width="8" height="40" fill="#1F4FE0"/><rect x="38" y="32" width="8" height="40" fill="#1F4FE0"/><rect x="54" y="32" width="8" height="40" fill="#1F4FE0"/><rect x="70" y="32" width="4" height="40" fill="#1F4FE0"/><rect x="16" y="20" width="64" height="12" fill="#0E1A2B"/></svg>
+            </div>
+            <div>
+              <h3>Imperium</h3>
+              <div class="kind">Suite de systèmes de jeu multi-moteurs</div>
+              <p>Les mêmes systèmes, avec la même API, sur Roblox, Unity, Unreal, Godot, le web et des moteurs maison. Chaque module porte un nom latin : Mundus pour le monde, Hora pour le temps.</p>
+              <span class="status">En développement</span>
+              <div class="meta">
+                <ul class="tags"><li>12 implémentations</li><li>9 langages</li></ul>
+                <a class="code-link" href="https://github.com/imperium-systems" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh"/></svg>Voir le code</a>
+              </div>
+
+            </div>
+            <!-- Explorateur : un même appel, moteur par moteur -->
+            <div class="imp">
+              <div class="imp-head">
+                <span class="imp-label">Régler l'heure à 18 h avec Hora</span>
+              </div>
+              <div class="imp-engines" role="tablist" aria-label="Moteur">
+                <button role="tab" aria-selected="true" data-engine="Roblox">Roblox</button>
+                <button role="tab" aria-selected="false" data-engine="Unity">Unity</button>
+                <button role="tab" aria-selected="false" data-engine="Unreal">Unreal</button>
+                <button role="tab" aria-selected="false" data-engine="Godot">Godot</button>
+                <button role="tab" aria-selected="false" data-engine="Maison">Moteur maison</button>
+                <button role="tab" aria-selected="false" data-engine="Web">Web</button>
+              </div>
+              <table class="imp-table">
+                <thead><tr><th scope="col">Langage</th><th scope="col">Emplacement</th><th scope="col">Appel</th></tr></thead>
+                <tbody>
+                  <tr data-engine="Roblox"><td>Luau</td><td><code>Imperium/Mundus/Hora</code></td><td><code>Hora.SetTime(18)</code></td></tr>
+                  <tr data-engine="Unity"><td>C#</td><td><code>namespace Imperium.Mundus</code></td><td><code>Hora.SetTime(18)</code></td></tr>
+                  <tr data-engine="Unreal"><td>C++</td><td><code>plugin Imperium, module ImperiumMundus</code></td><td><code>UHora::SetTime(18)</code></td></tr>
+                  <tr data-engine="Godot"><td>GDScript</td><td><code>addons/imperium/mundus/hora</code></td><td><code>Hora.set_time(18)</code></td></tr>
+                  <tr data-engine="Godot"><td>C#</td><td><code>namespace Imperium.Mundus</code></td><td><code>Hora.SetTime(18)</code></td></tr>
+                  <tr data-engine="Maison"><td>C++</td><td><code>imperium::mundus::hora</code></td><td><code>hora::set_time(18)</code></td></tr>
+                  <tr data-engine="Maison"><td>C#</td><td><code>namespace Imperium.Mundus</code></td><td><code>Hora.SetTime(18)</code></td></tr>
+                  <tr data-engine="Maison"><td>C</td><td><code>imperium/mundus/hora.h</code></td><td><code>imperium_hora_set_time(18)</code></td></tr>
+                  <tr data-engine="Maison"><td>Java</td><td><code>io.github.imperium_systems.mundus</code></td><td><code>Hora.setTime(18)</code></td></tr>
+                  <tr data-engine="Maison"><td>Python</td><td><code>imperium.mundus.hora</code></td><td><code>hora.set_time(18)</code></td></tr>
+                  <tr data-engine="Maison"><td>Rust</td><td><code>imperium::mundus::hora</code></td><td><code>hora::set_time(18)</code></td></tr>
+                  <tr data-engine="Web"><td>TypeScript</td><td><code>@imperium-systems/mundus</code></td><td><code>Hora.setTime(18)</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+          <details class="fold">
+            <summary><span class="when-closed">Voir les autres projets</span><span class="when-open">Masquer</span><svg aria-hidden="true"><use href="#chev"/></svg></summary>
+            <div class="fold-body">
+              <article class="project" data-order="2">
+                <div class="thumb" aria-hidden="true">
+                  <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#DCE2EA"/><rect x="28" y="16" width="48" height="66" fill="#FFFFFF" stroke="#56637A" transform="rotate(8 52 49)"/><rect x="22" y="14" width="48" height="66" fill="#FFFFFF" stroke="#0E1A2B"/><rect x="28" y="20" width="36" height="28" fill="#1F4FE0"/><rect x="28" y="56" width="28" height="4" fill="#0E1A2B"/><rect x="28" y="64" width="18" height="4" fill="#56637A"/></svg>
+                </div>
+                <div>
+                  <h3>CampusMatch</h3>
+                  <div class="kind">Projet personnel</div>
+                  <p>Choisir son université de 4e année en swipant. Un questionnaire (budget, pays, langue, climat…) calcule un score de compatibilité, le swipe affine le classement.</p>
+                  <span class="status">En développement</span>
+                  <div class="meta">
+                    <ul class="tags"><li>TypeScript</li><li>Score de compatibilité</li></ul>
+                    <a class="code-link" href="https://github.com/VictorTV57/campus-match" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh"/></svg>Voir le code</a>
+                  </div>
+                </div>
+              </article>
+              <article class="project" data-order="3">
+                <div class="thumb" aria-hidden="true">
+                  <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#FFFFFF"/><rect x="16" y="60" width="12" height="20" fill="#DCE2EA"/><rect x="34" y="44" width="12" height="36" fill="#8FA8F5"/><rect x="52" y="30" width="12" height="50" fill="#1F4FE0"/><rect x="70" y="18" width="12" height="62" fill="#0E1A2B"/><rect x="70" y="12" width="12" height="4" fill="#F5B800"/></svg>
+                </div>
+                <div>
+                  <h3>GPATek</h3>
+                  <div class="kind">Projet personnel</div>
+                  <p>Une extension web qui calcule ton GPA en temps réel, au fil de tes notes.</p>
+                  <div class="meta">
+                    <ul class="tags"><li>JavaScript</li><li>Extension web</li></ul>
+                    <a class="code-link" href="https://github.com/VictorTV57/GPATek" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh"/></svg>Voir le code</a>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </details>
+        </div>
+
+        <!-- Catégorie : entreprise -->
+        <div class="cat">
+          <h3 class="cat-title">En entreprise</h3>
+          <article class="project" data-order="1">
+            <div class="thumb" aria-hidden="true">
+              <svg viewBox="0 0 96 96" preserveAspectRatio="xMidYMid slice"><rect width="96" height="96" fill="#F3F5F8"/><rect x="10" y="16" width="76" height="64" fill="#FFFFFF" stroke="#DCE2EA"/><rect x="10" y="16" width="20" height="64" fill="#0E1A2B"/><rect x="36" y="24" width="44" height="8" fill="#DCE2EA"/><rect x="36" y="40" width="44" height="6" fill="#F3F5F8"/><rect x="36" y="52" width="44" height="6" fill="#F3F5F8"/><rect x="36" y="40" width="16" height="6" fill="#1F4FE0"/></svg>
+            </div>
+            <div>
+              <h3>Suivi de dossiers patients</h3>
+              <div class="kind">Stage chez ONYX Informatique, Yutz · sept. à déc. 2025</div>
+              <p>Application de suivi de dossiers médicaux : client multiplateforme en .NET MAUI, API web et base SQL Server.</p>
+              <div class="meta">
+                <ul class="tags"><li>C#</li><li>.NET MAUI</li><li>Web API</li><li>SQL Server</li></ul>
+                <span class="private"><svg aria-hidden="true"><use href="#lock"/></svg>Code privé</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="hackathons">
+        <h2>Hackathons</h2>
+        <p class="muted perso-intro">Coder contre la montre, en équipe.</p>
+        <!-- Même principe que les projets : data-order pour l'ordre (1 = en haut) -->
+        <ol class="hacks">
+          <li class="hack reveal" data-order="1">
+            <span class="hack-date">2026</span>
+            <h3>Nancy Justice Tech 2026</h3>
+            <p>Ce qu'on a construit, en une phrase.</p>
+            <span class="hack-result">Résultat ou prix</span>
+          </li>
+          <li class="hack reveal" data-order="2">
+            <span class="hack-date">2025</span>
+            <h3>Nancy Justice Tech 2025</h3>
+            <p>Ce qu'on a construit, en une phrase.</p>
+            <span class="hack-result">Résultat ou prix</span>
+          </li>
+          <li class="hack reveal" data-order="3">
+            <span class="hack-date">Année</span>
+            <h3>Game Jam EPITECH</h3>
+            <p>Le jeu créé, le thème imposé, en une phrase.</p>
+            <span class="hack-result">Résultat ou prix</span>
+          </li>
+          <li class="hack reveal" data-order="4">
+            <span class="hack-date">Année</span>
+            <h3>Hack'In Thionville</h3>
+            <p>Ce qu'on a construit, en une phrase.</p>
+            <span class="hack-result">Résultat ou prix</span>
+          </li>
+        </ol>
+      </section>
+
+      <section id="contact">
+        <div class="contact-box reveal">
+          <h2>On en parle ?</h2>
+          <p>Une question sur un projet, une opportunité de stage ? Écris-moi, je réponds vite.</p>
+          <div class="actions">
+            <a class="btn" href="mailto:victor.jost@epitech.eu"><svg aria-hidden="true"><use href="#mail"/></svg>victor.jost@epitech.eu</a>
+            <a class="btn ghost" href="https://www.linkedin.com/in/victor-jost" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#in"/></svg>LinkedIn</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="experience">
+        <h2>Expérience professionnelle et autres</h2>
+        <ol class="timeline">
+          <li class="now reveal">
+            <span class="when">En cours · association</span>
+            <h3>Responsable d'EpiClutch, EPITECH Nancy</h3>
+            <p>J'ai repris deux associations jeu vidéo de l'école : VOJAUJ, côté jeux gratuits et bonne ambiance, et EpiClutch, côté jeux payants et compétition (toujours dans la bonne ambiance). Elles ont fusionné sous le nom le plus connu, EpiClutch. On organise au moins deux soirées jeux vidéo par mois.</p>
+          </li>
+          <li class="now reveal">
+            <span class="when">En cours · EPITECH Nancy</span>
+            <h3>Ambassadeur EPITECH</h3>
+            <p>Je représente l'école sur les salons et lors des journées portes ouvertes, pour présenter la formation aux futurs étudiants et à leurs parents.</p>
+          </li>
+          <li class="now reveal">
+            <span class="when">En cours · Coding Club EPITECH</span>
+            <h3>Manta</h3>
+            <p>J'encadre des collégiens et des lycéens pendant les Coding Clubs : on monte des projets adaptés à leur niveau, et surtout fun, pour leur donner le goût de coder.</p>
+          </li>
+          <li class="reveal">
+            <span class="when">Sept. – déc. 2025 · stage</span>
+            <h3>Développeur stagiaire, ONYX Informatique</h3>
+            <p>Application de suivi de dossiers patients en C#/.NET MAUI, API web et SQL Server, à Yutz.</p>
+          </li>
+          <li class="reveal">
+            <span class="when">Juin 2025 et juin 2026 · bénévolat</span>
+            <h3>Capitaine d'équipe bénévole, VivaTech Paris</h3>
+            <p>Deux éditions à encadrer une équipe de bénévoles sur le salon, en partenariat avec EPITECH Nancy et TechUp Network.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section id="formation">
+        <h2>Formation</h2>
+        <ol class="timeline">
+          <li class="now reveal">
+            <span class="when">2024 – 2029</span>
+            <h3>Programme Grande École, EPITECH Nancy</h3>
+            <p>Pédagogie par projets. Actuellement en 3e année.</p>
+          </li>
+          <li class="reveal">
+            <span class="when">De la maternelle à 2024</span>
+            <h3>Nom de l'établissement, ville</h3>
+            <p>Toute ma scolarité dans le même établissement, de la maternelle au lycée. Baccalauréat, spécialités à préciser.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section id="competences">
+        <h2>Compétences</h2>
+        <div class="skills reveal">
+          <div class="skill-box">
+            <h3>Langages</h3>
+            <ul class="tags"><li>C</li><li>C++</li><li>C#</li><li>Python</li><li>JavaScript</li><li>TypeScript</li></ul>
+            <h4 class="skill-sub">Notions</h4>
+            <ul class="tags"><li>Luau</li><li>Rust</li><li>Haskell</li></ul>
+          </div>
+          <div class="skill-box">
+            <h3>Frameworks et outils</h3>
+            <ul class="tags"><li>.NET MAUI</li><li>Web API</li><li>Node.js</li><li>Vite</li><li>Astro</li><li>SQL Server</li><li>Git</li></ul>
+          </div>
+          <div class="skill-box langs">
+            <h3>Langues</h3>
+            <dl>
+              <div><dt>Français</dt><dd>Langue maternelle</dd></div>
+              <div><dt>Anglais</dt><dd>825 au TEPitech <span class="muted">(équivalent TOEIC)</span></dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section id="perso">
+        <h2>En dehors du code</h2>
+        <p class="muted perso-intro">Ce qui tourne sur mon écran et dans mes écouteurs quand je ne code pas.</p>
+
+        <!-- Jeux du moment -->
+        <div class="perso-block reveal">
+          <h3 class="cat-title">Mes jeux du moment</h3>
+          <ul class="now-playing">
+            <li>
+              <span class="cover" style="--c1:#1F4FE0;--c2:#0E1A2B" aria-hidden="true"></span>
+              <div class="np-info">
+                <strong>Roblox</strong>
+                <span class="muted">PC · je développe aussi dessus</span>
+              </div>
+              <span class="np-time">Tous les jours</span>
+            </li>
+            <li>
+              <span class="cover" style="--c1:#F5B800;--c2:#0E1A2B" aria-hidden="true"></span>
+              <div class="np-info">
+                <strong>Titre du jeu</strong>
+                <span class="muted">Plateforme</span>
+                <span class="bar" style="--p:46%" role="img" aria-label="Succès : 12 sur 26"></span>
+              </div>
+              <span class="np-time">12 / 26 succès</span>
+            </li>
+            <li>
+              <span class="cover" style="--c1:#56637A;--c2:#DCE2EA" aria-hidden="true"></span>
+              <div class="np-info">
+                <strong>Titre du jeu</strong>
+                <span class="muted">Plateforme</span>
+                <span class="bar" style="--p:80%" role="img" aria-label="Succès : 40 sur 50"></span>
+              </div>
+              <span class="np-time">40 / 50 succès</span>
+            </li>
+          </ul>
+          <a class="more-link" href="https://steamcommunity.com/id/TON-PROFIL" target="_blank" rel="noopener">Mon profil Steam <svg aria-hidden="true"><use href="#arrow"/></svg></a>
+        </div>
+
+        <!-- Jeux préférés : un classement, donc numéroté -->
+        <div class="perso-block reveal">
+          <h3 class="cat-title">Mes jeux préférés</h3>
+          <ol class="covers">
+            <li><span class="poster" style="--c1:#0E1A2B;--c2:#1F4FE0" aria-hidden="true"><span class="rank">1</span></span><strong>Titre du jeu</strong><span class="muted">Année</span></li>
+            <li><span class="poster" style="--c1:#1F4FE0;--c2:#8FA8F5" aria-hidden="true"><span class="rank">2</span></span><strong>Titre du jeu</strong><span class="muted">Année</span></li>
+            <li><span class="poster" style="--c1:#F5B800;--c2:#0E1A2B" aria-hidden="true"><span class="rank">3</span></span><strong>Titre du jeu</strong><span class="muted">Année</span></li>
+            <li><span class="poster" style="--c1:#56637A;--c2:#0E1A2B" aria-hidden="true"><span class="rank">4</span></span><strong>Titre du jeu</strong><span class="muted">Année</span></li>
+          </ol>
+        </div>
+
+        <!-- Films préférés -->
+        <div class="perso-block reveal">
+          <h3 class="cat-title">Mes films préférés</h3>
+          <ul class="covers films">
+            <li><span class="poster" style="--c1:#0E1A2B;--c2:#F5B800" aria-hidden="true"></span><strong>Titre du film</strong><span class="muted">Réalisateur, année</span></li>
+            <li><span class="poster" style="--c1:#1F4FE0;--c2:#0E1A2B" aria-hidden="true"></span><strong>Titre du film</strong><span class="muted">Réalisateur, année</span></li>
+            <li><span class="poster" style="--c1:#DCE2EA;--c2:#56637A" aria-hidden="true"></span><strong>Titre du film</strong><span class="muted">Réalisateur, année</span></li>
+            <li><span class="poster" style="--c1:#0E1A2B;--c2:#8FA8F5" aria-hidden="true"></span><strong>Titre du film</strong><span class="muted">Réalisateur, année</span></li>
+            <li><span class="poster" style="--c1:#F5B800;--c2:#1F4FE0" aria-hidden="true"></span><strong>Titre du film</strong><span class="muted">Réalisateur, année</span></li>
+          </ul>
+        </div>
+
+        <!-- Spotify -->
+        <div class="perso-block reveal">
+          <h3 class="cat-title">Sur mon Spotify</h3>
+          <!--
+            Pour afficher ta vraie playlist, remplace le bloc .playlist ci-dessous par le lecteur officiel :
+            Spotify > ta playlist > ... > Partager > Intégrer la playlist, puis colle le code, du type :
+            <iframe src="https://open.spotify.com/embed/playlist/TON_ID_DE_PLAYLIST" width="100%" height="352"
+                    frameborder="0" allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          -->
+          <div class="playlist">
+            <div class="pl-head">
+              <span class="pl-cover" aria-hidden="true"></span>
+              <div>
+                <strong>Nom de ma playlist</strong>
+                <span class="muted">Ce que j'écoute en codant</span>
+              </div>
+            </div>
+            <ol class="tracks">
+              <li><span class="t-num">1</span><span class="t-name"><strong>Titre</strong><span class="muted">Artiste</span></span><span class="t-len">3:24</span></li>
+              <li><span class="t-num">2</span><span class="t-name"><strong>Titre</strong><span class="muted">Artiste</span></span><span class="t-len">2:58</span></li>
+              <li><span class="t-num">3</span><span class="t-name"><strong>Titre</strong><span class="muted">Artiste</span></span><span class="t-len">4:11</span></li>
+              <li><span class="t-num">4</span><span class="t-name"><strong>Titre</strong><span class="muted">Artiste</span></span><span class="t-len">3:47</span></li>
+              <li><span class="t-num">5</span><span class="t-name"><strong>Titre</strong><span class="muted">Artiste</span></span><span class="t-len">3:05</span></li>
+            </ol>
+          </div>
+          <a class="more-link" href="https://open.spotify.com/user/TON-PROFIL" target="_blank" rel="noopener">Écouter sur Spotify <svg aria-hidden="true"><use href="#arrow"/></svg></a>
+        </div>
+      </section>
+
+      <footer>© 2026 Victor Jost · Site statique Astro, hébergé sur GitHub Pages</footer>
+
+
+    </div>
+  </main>
+</div>
+
+
+<!-- ===== Pages photos (une vraie page par projet dans Astro : /projets/robocar, /projets/house-scoreboard) ===== -->
+<div class="subpage" id="page-robocar" hidden>
+  <div class="sub-inner">
+    <a class="back" href="#projets"><svg aria-hidden="true"><use href="#back"/></svg>Retour aux projets</a>
+    <header class="sub-head">
+      <span class="sub-kind">Projet pédagogique national EPITECH</span>
+      <h1>Robocar</h1>
+      <p>Une voiture RC autonome qui suit deux lignes blanches. Le projet couvre tout : le modèle d'IA en Python, le câblage et la soudure, le branchement de la batterie, de la Jetson Nano, du convertisseur et de la caméra, le covering et l'impression de pièces en 3D.</p>
+      <ul class="tags"><li>Python</li><li>IA</li><li>Jetson Nano</li><li>Impression 3D</li></ul>
+      <p class="sub-note"><svg aria-hidden="true"><use href="#lock"/></svg>Le code de ce projet n'est pas public : voici le projet en images.</p>
+    </header>
+    <div class="gallery">
+      <figure class="ph big"><span class="ph-img" aria-hidden="true"></span><figcaption>La voiture terminée, sur la piste</figcaption></figure>
+      <figure class="ph"><span class="ph-img" aria-hidden="true"></span><figcaption>Câblage et soudure</figcaption></figure>
+      <figure class="ph"><span class="ph-img" aria-hidden="true"></span><figcaption>Jetson Nano et caméra</figcaption></figure>
+      <figure class="ph"><span class="ph-img" aria-hidden="true"></span><figcaption>Pièces imprimées en 3D</figcaption></figure>
+      <figure class="ph"><span class="ph-img" aria-hidden="true"></span><figcaption>Le covering</figcaption></figure>
+      <figure class="ph wide"><span class="ph-img" aria-hidden="true"></span><figcaption>Ce que voit la caméra pendant l'entraînement du modèle</figcaption></figure>
+    </div>
+  </div>
+</div>
+
+<div class="subpage" id="page-house-scoreboard" hidden>
+  <div class="sub-inner">
+    <a class="back" href="#projets"><svg aria-hidden="true"><use href="#back"/></svg>Retour aux projets</a>
+    <header class="sub-head">
+      <span class="sub-kind">Projet scolaire EPITECH</span>
+      <h1>House Scoreboard</h1>
+      <p>Un site pour saisir les temps de natation et calculer automatiquement les points selon un barème inventé par le professeur. Il garde l'historique de toutes les compétitions.</p>
+      <ul class="tags"><li>TypeScript</li><li>Node.js</li><li>Vite</li></ul>
+      <p class="sub-note"><svg aria-hidden="true"><use href="#lock"/></svg>Le code de ce projet n'est pas public : voici le projet en images.</p>
+    </header>
+    <div class="gallery">
+      <figure class="ph big"><span class="ph-img" aria-hidden="true"></span><figcaption>Le classement général</figcaption></figure>
+      <figure class="ph"><span class="ph-img" aria-hidden="true"></span><figcaption>Saisie des temps</figcaption></figure>
+      <figure class="ph"><span class="ph-img" aria-hidden="true"></span><figcaption>Le barème de points</figcaption></figure>
+      <figure class="ph wide"><span class="ph-img" aria-hidden="true"></span><figcaption>L'historique des compétitions</figcaption></figure>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  // Tri des projets par data-order, dans chaque catégorie
+  document.querySelectorAll('#projets .cat').forEach(cat => {
+    const items = [...cat.querySelectorAll('article.project')]
+      .sort((a, b) => num(a) - num(b));
+    function num(el) { const n = parseFloat(el.dataset.order); return Number.isFinite(n) ? n : Infinity; }
+    let fold = cat.querySelector('details.fold');
+    if (!fold && items.length > 1) {
+      fold = document.createElement('details');
+      fold.className = 'fold';
+      fold.innerHTML = '<summary><span class="when-closed"></span><span class="when-open">Masquer</span><svg aria-hidden="true"><use href="#chev"/></svg></summary><div class="fold-body"></div>';
+      cat.appendChild(fold);
+    }
+    const [first, ...rest] = items;
+    first.classList.add('reveal');
+    cat.insertBefore(first, fold || null);
+    if (fold) {
+      const body = fold.querySelector('.fold-body');
+      rest.forEach(a => { a.classList.remove('reveal'); body.appendChild(a); });
+      fold.hidden = rest.length === 0;
+      fold.querySelector('.when-closed').textContent =
+        rest.length === 1 ? 'Voir 1 autre projet' : `Voir ${rest.length} autres projets`;
+    }
+  });
+
+
+  // Tri des hackathons par data-order
+  const hacks = document.querySelector('.hacks');
+  [...hacks.children].sort((a, b) => (parseFloat(a.dataset.order) || Infinity) - (parseFloat(b.dataset.order) || Infinity)).forEach(li => hacks.appendChild(li));
+
+  // Sommaire : la section visible s'allume
+  const links = [...document.querySelectorAll('[data-nav]')];
+  const sections = links.map(l => document.querySelector(l.hash));
+  function updateToc() {
+    let current = sections[0];
+    const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+    if (atBottom) current = sections.at(-1);
+    else for (const s of sections) if (s.getBoundingClientRect().top < innerHeight * 0.35) current = s;
+    links.forEach(l => l.classList.toggle('current', l.hash === '#' + current.id));
+  }
+  addEventListener('scroll', updateToc, { passive: true });
+  updateToc();
+
+
+  // Explorateur Imperium : filtrer le tableau par moteur
+  const engButtons = document.querySelectorAll('.imp-engines button');
+  const engRows = document.querySelectorAll('.imp-table tbody tr');
+  function showEngine(name) {
+    engButtons.forEach(b => b.setAttribute('aria-selected', b.dataset.engine === name));
+    engRows.forEach(r => { r.hidden = r.dataset.engine !== name; });
+  }
+  engButtons.forEach(b => b.addEventListener('click', () => showEngine(b.dataset.engine)));
+  showEngine('Roblox');
+
+  // Pages photos : #/robocar et #/house-scoreboard (de vraies pages séparées dans Astro)
+  const home = document.getElementById('home');
+  const pages = document.querySelectorAll('.subpage');
+  function route() {
+    const m = location.hash.match(/^#\/(.+)$/);
+    const page = m && document.getElementById('page-' + m[1]);
+    pages.forEach(pg => { pg.hidden = pg !== page; });
+    home.hidden = !!page;
+    if (page) { window.scrollTo(0, 0); page.querySelector('.back').focus({ preventScroll: true }); }
+    else if (location.hash) { const t = document.querySelector(location.hash); if (t) t.scrollIntoView(); }
+    updateToc();
+  }
+  addEventListener('hashchange', route);
+  route();
+
+  // Effet signature : les cases de 24px s'allument sous la souris puis s'éteignent
+  (function () {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hover = matchMedia('(hover: hover)').matches;
+    if (reduce || !hover) return;
+    const cv = document.getElementById('grid-glow');
+    const ctx = cv.getContext('2d');
+    const CELL = 24, LIFE = 900;
+    const cells = new Map();
+    let w, h, dpr, running = false;
+    function size() {
+      dpr = devicePixelRatio || 1; w = innerWidth; h = innerHeight;
+      cv.width = w * dpr; cv.height = h * dpr; cv.style.width = w + 'px'; cv.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function frame(t) {
+      ctx.clearRect(0, 0, w, h);
+      for (const [key, born] of cells) {
+        const age = t - born;
+        if (age > LIFE) { cells.delete(key); continue; }
+        const [cx, cy] = key.split(',').map(Number);
+        ctx.globalAlpha = (1 - age / LIFE) * 0.14;
+        ctx.fillStyle = '#1F4FE0';
+        ctx.fillRect(cx * CELL + 1, cy * CELL - scrollY + 1, CELL - 1, CELL - 1);
+      }
+      if (cells.size) requestAnimationFrame(frame); else running = false;
+    }
+    addEventListener('pointermove', e => {
+      if (e.target.closest('.side, .project, .hack, .skill-box, .contact-box, .timeline, .now-playing, .covers, .playlist, .ph, .sub-head, .back')) return;
+      const cx = Math.floor(e.clientX / CELL), cy = Math.floor((e.clientY + scrollY) / CELL);
+      cells.set(cx + ',' + cy, performance.now());
+      if (!running) { running = true; requestAnimationFrame(frame); }
+    }, { passive: true });
+    addEventListener('resize', size);
+    size();
+  })();
+</script>
+</body>
+</html>

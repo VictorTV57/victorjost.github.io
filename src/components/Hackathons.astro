@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  /** Déjà triés par `order`. */
+  items: CollectionEntry<'hackathons'>[];
+}
+
+const { items } = Astro.props;
+---
+<ol class="hacks">
+  {items.map(({ data }) => (
+    <li class="hack reveal">
+      <span class="hack-date">{data.date}</span>
+      <h3>{data.title}</h3>
+      <p>{data.summary}</p>
+      <span class="hack-result">{data.result}</span>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .hacks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+  .hack { background: var(--surface); border: 1px solid var(--line); padding: var(--space-6); display: flex; flex-direction: column; gap: 4px; }
+  .hack-date { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
+  h3 { margin: 0; font-size: 18px; line-height: 24px; }
+  p { margin: 4px 0 0; }
+  .hack-result { margin-top: auto; padding-top: var(--space-4); align-self: flex-start; font-size: 13px; font-weight: 700; }
+  .hack-result::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--accent); margin-right: 8px; }
+  @media (max-width: 560px) { .hacks { grid-template-columns: 1fr; } }
+</style>

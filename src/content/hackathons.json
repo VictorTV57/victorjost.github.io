@@ -1,0 +1,6 @@
+[
+  { "id": "nancy-justice-tech-2026", "order": 1, "date": "2026", "title": "Nancy Justice Tech 2026", "summary": "Ce qu'on a construit, en une phrase.", "result": "Résultat ou prix" },
+  { "id": "nancy-justice-tech-2025", "order": 2, "date": "2025", "title": "Nancy Justice Tech 2025", "summary": "Ce qu'on a construit, en une phrase.", "result": "Résultat ou prix" },
+  { "id": "game-jam-epitech", "order": 3, "date": "Année", "title": "Game Jam EPITECH", "summary": "Le jeu créé, le thème imposé, en une phrase.", "result": "Résultat ou prix" },
+  { "id": "hackin-thionville", "order": 4, "date": "Année", "title": "Hack'In Thionville", "summary": "Ce qu'on a construit, en une phrase.", "result": "Résultat ou prix" }
+]

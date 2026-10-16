@@ -1,0 +1,63 @@
+---
+// Effet signature : les cases de 24px de la grille s'allument sous la souris puis s'éteignent.
+---
+<canvas id="grid-glow" aria-hidden="true"></canvas>
+
+<style>
+  #grid-glow { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+</style>
+
+<script>
+  const CELL = 24;
+  const LIFE = 900;
+  const COLOR = '#1F4FE0';
+  // Pas d'effet au-dessus des blocs de contenu, seulement sur la grille nue
+  const SOLID = '.side, .project, .hack, .skill-box, .contact-box, .timeline, .now-playing, .covers, .playlist, .ph, .sub-head, .back';
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hover = matchMedia('(hover: hover)').matches;
+  const canvas = document.getElementById('grid-glow') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d');
+
+  if (canvas && ctx && !reduce && hover) {
+    const cells = new Map<string, number>();
+    let w = 0;
+    let h = 0;
+    let running = false;
+
+    const size = () => {
+      const dpr = devicePixelRatio || 1;
+      w = innerWidth;
+      h = innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const frame = (t: number) => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = COLOR;
+      for (const [key, born] of cells) {
+        const age = t - born;
+        if (age > LIFE) { cells.delete(key); continue; }
+        const [cx, cy] = key.split(',').map(Number);
+        ctx.globalAlpha = (1 - age / LIFE) * 0.14;
+        ctx.fillRect(cx * CELL + 1, cy * CELL - scrollY + 1, CELL - 1, CELL - 1);
+      }
+      if (cells.size) requestAnimationFrame(frame);
+      else running = false;
+    };
+
+    addEventListener('pointermove', (e) => {
+      if (e.target instanceof Element && e.target.closest(SOLID)) return;
+      const cx = Math.floor(e.clientX / CELL);
+      const cy = Math.floor((e.clientY + scrollY) / CELL);
+      cells.set(`${cx},${cy}`, performance.now());
+      if (!running) { running = true; requestAnimationFrame(frame); }
+    }, { passive: true });
+    addEventListener('resize', size);
+    size();
+  }
+</script>

@@ -1,0 +1,95 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { site, url } from '../../data/site';
+import Base from '../../layouts/Base.astro';
+
+// Une page photos par projet qui déclare un bloc `page` dans son fichier .md
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', (p) => p.data.page !== undefined);
+  return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, summary, tags, repo, page } = project.data;
+const { Content } = await render(project);
+---
+<Base title={`${title} — ${site.name}`} description={summary}>
+  <main class="subpage">
+    <div class="sub-inner">
+      <a class="back" href={url('#projets')}><svg aria-hidden="true"><use href="#back" /></svg>Retour aux projets</a>
+      <header class="sub-head">
+        <span class="sub-kind">{page?.kind}</span>
+        <h1>{title}</h1>
+        <div class="sub-body"><Content /></div>
+        <ul class="tags">{tags.map((tag) => <li>{tag}</li>)}</ul>
+        {repo ? (
+          <a class="sub-note link" href={repo} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh" /></svg>Voir le code</a>
+        ) : (
+          <p class="sub-note"><svg aria-hidden="true"><use href="#lock" /></svg>Le code de ce projet n'est pas public : voici le projet en images.</p>
+        )}
+      </header>
+
+      <div class="gallery">
+        {page?.photos.map((photo) => (
+          <figure class:list={['ph', photo.size]}>
+            {photo.src ? (
+              <span class="ph-img">
+                <Image src={photo.src} alt={photo.alt ?? photo.caption} widths={[480, 960, 1440]} sizes="(max-width: 760px) 100vw, 1040px" />
+              </span>
+            ) : (
+              <span class="ph-img placeholder" aria-hidden="true"></span>
+            )}
+            <figcaption>{photo.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .subpage { position: relative; z-index: 1; min-height: 100vh; }
+  .sub-inner { max-width: 1040px; margin: 0 auto; padding: 48px 48px 96px; }
+  .back { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: 700; font-size: 14px; text-decoration: none; padding: 8px 12px; background: var(--surface); border: 1px solid var(--ink-muted); border-radius: var(--radius-sm); color: var(--ink); }
+  .back:hover { border-color: var(--ink); }
+  .back svg { width: 16px; height: 16px; }
+  .sub-head { margin: var(--space-12) 0; max-width: 680px; }
+  .sub-kind { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
+  h1 { margin: var(--space-2) 0 var(--space-4); font-size: 56px; line-height: 56px; font-weight: 800; letter-spacing: -.02em; }
+  .sub-body :global(p) { margin: 0 0 var(--space-4); }
+  .sub-note { display: flex; align-items: center; gap: var(--space-2); color: var(--ink-muted); font-size: 14px; margin: var(--space-4) 0 0; }
+  .sub-note.link { display: inline-flex; color: var(--brand); font-weight: 700; text-decoration: none; }
+  .sub-note.link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .sub-note svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+  .ph { margin: 0; background: var(--surface); border: 1px solid var(--line); }
+  .ph.big { grid-column: span 2; grid-row: span 2; }
+  .ph.wide { grid-column: 1 / -1; }
+  .ph-img { display: block; aspect-ratio: 4 / 3; overflow: hidden; }
+  .ph-img :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .placeholder {
+    background:
+      linear-gradient(135deg, transparent 49.6%, var(--line) 49.6% 50.4%, transparent 50.4%),
+      linear-gradient(45deg, transparent 49.6%, var(--line) 49.6% 50.4%, transparent 50.4%), var(--paper);
+  }
+  .ph.big .ph-img { aspect-ratio: auto; height: calc(100% - 45px); min-height: 240px; }
+  .ph.wide .ph-img { aspect-ratio: 21 / 8; }
+  figcaption { padding: 12px var(--space-4); font-size: 14px; color: var(--ink-muted); border-top: 1px solid var(--line); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sub-inner { animation: in .5s var(--ease-out); }
+  }
+  @media (max-width: 760px) {
+    .sub-inner { padding: 24px 16px 72px; }
+    h1 { font-size: 40px; line-height: 44px; }
+    .gallery { grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .ph.big { grid-column: 1 / -1; grid-row: auto; }
+    .ph.big .ph-img { height: auto; aspect-ratio: 4 / 3; }
+  }
+</style>
