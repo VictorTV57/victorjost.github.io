@@ -1,4 +1,5 @@
 ---
+import { cv } from '../data/cv';
 import { site } from '../data/site';
 import { otherLang, type Lang } from '../i18n';
 import { href, type Section, type TocId } from '../i18n/routes';
@@ -53,7 +54,8 @@ const Name = isHome ? 'h1' : 'p';
     <p class="pitch in" style="--i:2">{site.pitch[lang]}</p>
     <span class="badge in" style="--i:3"><span class="dot" aria-hidden="true"></span>{site.availability[lang]}</span>
     <div class="actions in" style="--i:4">
-      <a class="btn" href={site.github} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh" /></svg>{ui.githubCta}</a>
+      <a class="btn" href={cv[lang].href} download={cv[lang].filename} aria-label={ui.cvAria}><svg aria-hidden="true"><use href="#download" /></svg>{ui.cvCta}</a>
+      <a class="btn ghost" href={site.github} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh" /></svg>{ui.githubCta}</a>
       <a class="btn ghost" href="#contact">{ui.contactCta}</a>
     </div>
 

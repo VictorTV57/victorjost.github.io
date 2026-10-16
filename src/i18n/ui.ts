@@ -20,6 +20,8 @@ const fr = {
   },
   githubCta: 'Voir mon GitHub',
   contactCta: 'Me contacter',
+  cvCta: 'Télécharger mon CV',
+  cvAria: 'Télécharger mon CV (PDF)',
   about: 'À propos',
   categories: {
     epitech: 'Projets EPITECH',
@@ -103,6 +105,8 @@ const en: typeof fr = {
   },
   githubCta: 'View my GitHub',
   contactCta: 'Contact me',
+  cvCta: 'Download my resume',
+  cvAria: 'Download my resume (PDF)',
   about: 'About',
   categories: {
     epitech: 'EPITECH projects',
