@@ -1,0 +1,10 @@
+---
+import ErrorPage from '../layouts/ErrorPage.astro';
+---
+<ErrorPage
+  code="400"
+  title="Requête invalide"
+  message="Le serveur n'a pas compris la demande. Vérifie l'adresse ou le lien que tu as suivi, puis réessaie."
+  variant="plain"
+  actions={['home', 'contact']}
+/>

@@ -1,0 +1,51 @@
+---
+import { cellStyle, drawCode, type Variant } from '../lib/pixel-code';
+
+interface Props {
+  code: string;
+  variant: Variant;
+}
+
+const { code, variant } = Astro.props;
+const { cols, rows, cells } = drawCode(code, variant);
+---
+<div class="art" role="img" aria-label={`Erreur ${code}`} style={`--cols:${cols};--rows:${rows}`}>
+  {cells.map((cell, i) => <span class={cell.className} style={cellStyle(cell, i)}></span>)}
+</div>
+
+<style>
+  .art { position: relative; display: grid; grid-template-columns: repeat(var(--cols), var(--cell)); grid-template-rows: repeat(var(--rows), var(--cell)); }
+  .px { background: var(--brand); }
+  .px.ghost { background: transparent; outline: 2px dashed var(--ink-muted); outline-offset: calc(var(--cell) * -.18); }
+  .px.hl { background: var(--accent); }
+  .px.dark { background: var(--ink); }
+  .stripe { background: repeating-linear-gradient(135deg, var(--accent) 0 6px, var(--ink) 6px 12px); }
+  .lock-body { background: var(--ink); }
+  .track { outline: 1px dashed var(--ink-muted); outline-offset: -1px; }
+
+  /* Une seule animation orchestrée : les cases se posent sur la grille au chargement */
+  @media (prefers-reduced-motion: no-preference) {
+    .px, .stripe, .lock-body { animation: drop .5s var(--ease-out) both; animation-delay: calc(var(--i) * 14ms); }
+    @keyframes drop { from { opacity: 0; transform: translateY(calc(var(--cell) * -1)); } to { opacity: 1; transform: none; } }
+    /* 500 : quelques cases se décrochent et tombent sous le chiffre */
+    .px.fall { animation: drop .5s var(--ease-out) both, fall .7s cubic-bezier(.5, 0, .75, 0) forwards; animation-delay: calc(var(--i) * 14ms), calc(900ms + var(--k) * 180ms); }
+    @keyframes fall { to { transform: translateY(calc(var(--cell) * var(--d))); } }
+    /* 502 : le pont entre les deux blocs clignote, la liaison ne passe pas */
+    .px.bridge { animation: drop .5s both, blink 1.2s steps(1) 1s infinite; animation-delay: calc(var(--i) * 14ms), 1s; }
+    @keyframes blink { 50% { opacity: .15; } }
+    /* 410 : le chiffre s'efface case par case, de haut en bas */
+    .px.erase { animation: drop .5s var(--ease-out) both, erase .35s ease-in forwards; animation-delay: calc(var(--i) * 14ms), calc(900ms + var(--k) * 90ms); }
+    @keyframes erase { to { opacity: .12; transform: scale(.5); } }
+    /* 429 : la pile tombe sur le chiffre une fois celui-ci posé */
+    .px.pile { animation-delay: calc(800ms + var(--k) * 110ms); }
+    /* 504 : la barre se remplit de plus en plus lentement, puis la dernière case attend */
+    .px.load { animation: load .25s var(--ease-out) both; animation-delay: calc(900ms + var(--k) * var(--k) * 9ms); }
+    @keyframes load { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: none; } }
+    .px.load { transform-origin: left; }
+    .px.wait { animation: load .25s both, blink 1.2s steps(1) infinite; animation-delay: calc(900ms + var(--k) * var(--k) * 9ms); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .px.fall { transform: translateY(calc(var(--cell) * var(--d))); }
+    .px.erase { opacity: .12; transform: scale(.5); }
+  }
+</style>

@@ -1,0 +1,10 @@
+---
+import ErrorPage from '../layouts/ErrorPage.astro';
+---
+<ErrorPage
+  code="429"
+  title="Trop de requêtes"
+  message="Beaucoup de demandes en très peu de temps. Patiente quelques secondes, puis réessaie."
+  variant="overflow"
+  actions={['retry', 'home']}
+/>

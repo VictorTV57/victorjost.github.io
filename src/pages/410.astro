@@ -1,0 +1,11 @@
+---
+import ErrorPage from '../layouts/ErrorPage.astro';
+---
+<ErrorPage
+  code="410"
+  title="Page supprimée"
+  message="Cette page a existé, mais je l'ai retirée pour de bon. Le reste du portfolio, lui, est toujours là."
+  variant="erased"
+  actions={['home', 'projects']}
+  showPath
+/>

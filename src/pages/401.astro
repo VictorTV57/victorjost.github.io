@@ -1,0 +1,10 @@
+---
+import ErrorPage from '../layouts/ErrorPage.astro';
+---
+<ErrorPage
+  code="401"
+  title="Connexion requise"
+  message="Cette page demande de se connecter. Si tu penses devoir y avoir accès, écris-moi."
+  variant="key"
+  actions={['home', 'contact']}
+/>

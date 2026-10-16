@@ -1,0 +1,14 @@
+/* Tokens — design system « Victor Jost » (https://claude.ai/artifact/3QgCeSwDMcaXUkdLgqLdao) */
+:root {
+  --paper: #F3F5F8; --surface: #FFFFFF; --line: #DCE2EA;
+  --ink: #0E1A2B; --ink-muted: #56637A;
+  --brand: #1F4FE0; --brand-hover: #1A43C2; --on-brand: #FFFFFF; --accent: #F5B800;
+  --success: #1B7F4B; --danger: #C42F28;
+  --space-2: 8px; --space-4: 16px; --space-6: 24px; --space-12: 48px;
+  --radius-0: 0; --radius-sm: 2px; --radius-md: 4px;
+  --font-sans: "Archivo", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* Tons dérivés pour les fonds sombres (ink) */
+  --ink-line: #2A3A52; --ink-text: #C3CCDA; --ink-soft: #8E9BB0; --brand-light: #8FA8F5;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+}
