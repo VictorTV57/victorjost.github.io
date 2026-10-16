@@ -7,6 +7,8 @@ export interface Step {
   when: Text;
   title: Text;
   text: Text;
+  /** Points clés (diplômes, mentions, options), en liste sous le texte. */
+  details?: Text[];
   /** En cours : le repère de la frise est plein. */
   now?: boolean;
 }
@@ -80,14 +82,22 @@ export const formation: Step[] = [
     now: true,
   },
   {
-    id: 'lycee',
+    id: 'indp',
     kind: 'formation',
-    when: { fr: 'De la maternelle à 2024', en: 'From nursery school to 2024' },
-    title: { fr: "Nom de l'établissement, ville", en: 'School name, city' },
+    when: '2009 – 2024',
+    title: 'INDP, Thionville',
     text: {
-      fr: 'Toute ma scolarité dans le même établissement, de la maternelle au lycée. Baccalauréat, spécialités à préciser.',
-      en: 'My whole schooling in the same school, from nursery to high school. Baccalauréat, specialities to be specified.',
+      fr: 'Toute ma scolarité dans le même établissement, de la maternelle au lycée.',
+      en: 'My whole schooling in the same school, from nursery to high school.',
     },
+    details: [
+      { fr: 'Brevet : mention Bien', en: 'Brevet (end of middle school): “Bien” (good) grade' },
+      { fr: 'Seconde : option management', en: 'Year 10 (Seconde): management option' },
+      {
+        fr: 'Bac technologique STMG, option ressources humaines : mention Assez bien',
+        en: 'Technological baccalauréat STMG, human resources option: “Assez bien” (fairly good) grade',
+      },
+    ],
   },
 ];
 
