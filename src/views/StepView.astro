@@ -15,7 +15,7 @@ const { lang, step } = Astro.props;
 const ui = useUi(lang);
 const kind = step.kind === 'experience' ? ui.journey.experience : ui.journey.formation;
 ---
-<SiteLayout lang={lang} route={{ section: 'journey', id: step.id }} title={tr(step.title, lang)} description={tr(step.text, lang)}>
+<SiteLayout lang={lang} route={{ section: 'journey', id: step.id }} title={tr(step.title, lang)} description={tr(step.text, lang)} active={step.kind}>
   <section>
     <DetailHeader back={{ href: href(lang, 'journey'), label: ui.journey.back }} kicker={`${kind} · ${tr(step.when, lang)}`} title={tr(step.title, lang)}>
       <p>{tr(step.text, lang)}</p>

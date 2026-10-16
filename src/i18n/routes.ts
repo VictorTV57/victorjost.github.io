@@ -16,6 +16,9 @@ const SLUGS: Record<Section, Localized> = {
   beyond: { fr: 'en-dehors-du-code', en: 'beyond-code' },
 };
 
+/** Ancres des sections de l'accueil, dans leur ordre d'apparition : ce sont les entrées du sommaire. */
+export type TocId = 'a-propos' | 'projets' | 'hackathons' | 'contact' | 'experience' | 'formation' | 'competences' | 'perso';
+
 export interface Route {
   section: Section;
   /** Identifiant d'un élément (projet, hackathon, étape du parcours) pour sa page de détail. */

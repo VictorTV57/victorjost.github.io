@@ -1,23 +1,46 @@
 ---
 import { site } from '../data/site';
 import { otherLang, type Lang } from '../i18n';
-import { href, type Section } from '../i18n/routes';
+import { href, type Section, type TocId } from '../i18n/routes';
 import { useUi } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
-  /** Section affichée, allumée dans le menu. */
+  /** Page affichée. */
   current: Section;
+  /** Entrée du sommaire à allumer hors de l'accueil (sinon déduite de la page). */
+  active?: TocId;
   /** Adresse de la page courante dans l'autre langue. */
   alternate: string;
 }
 
-const { lang, current, alternate } = Astro.props;
+const { lang, current, active, alternate } = Astro.props;
 const ui = useUi(lang);
 const other = otherLang(lang);
-const nav: Section[] = ['home', 'projects', 'hackathons', 'journey', 'skills', 'beyond'];
+const isHome = current === 'home';
+
+const toc: { id: TocId; label: string }[] = [
+  { id: 'a-propos', label: ui.nav.about },
+  { id: 'projets', label: ui.nav.projects },
+  { id: 'hackathons', label: ui.nav.hackathons },
+  { id: 'contact', label: ui.nav.contact },
+  { id: 'experience', label: ui.nav.experience },
+  { id: 'formation', label: ui.nav.formation },
+  { id: 'competences', label: ui.nav.skills },
+  { id: 'perso', label: ui.nav.beyond },
+];
+
+// Sur l'accueil, le sommaire suit le défilement (script plus bas).
+// Ailleurs, il renvoie vers les sections de l'accueil et allume celle de la page.
+const SECTION_TOC: Partial<Record<Section, TocId>> = {
+  projects: 'projets', hackathons: 'hackathons', journey: 'experience', skills: 'competences', beyond: 'perso',
+};
+const activeId = isHome ? undefined : (active ?? SECTION_TOC[current]);
+// Le contact est en bas de chaque page : son ancre reste locale
+const tocHref = (id: TocId) => (isHome || id === 'contact' ? `#${id}` : `${href(lang, 'home')}#${id}`);
+
 // Le nom est le titre de l'accueil ; sur les autres pages, le titre est celui de la page
-const Name = current === 'home' ? 'h1' : 'p';
+const Name = isHome ? 'h1' : 'p';
 ---
 <aside class="side">
   <div class="side-inner">
@@ -33,12 +56,11 @@ const Name = current === 'home' ? 'h1' : 'p';
       <a class="btn ghost" href="#contact">{ui.contactCta}</a>
     </div>
 
-    <nav class="toc in" style="--i:5" aria-label={ui.nav.label}>
+    <nav class="toc in" style="--i:5" aria-label={ui.nav.label} data-spy={isHome ? '' : undefined}>
       <ol>
-        {nav.map((section) => (
-          <li><a href={href(lang, section)} aria-current={section === current ? 'page' : undefined}>{ui.nav[section]}</a></li>
+        {toc.map(({ id, label }) => (
+          <li><a href={tocHref(id)} class:list={{ current: id === activeId }}>{label}</a></li>
         ))}
-        <li><a href="#contact">{ui.nav.contact}</a></li>
       </ol>
     </nav>
 
@@ -70,13 +92,13 @@ const Name = current === 'home' ? 'h1' : 'p';
   .dot::after { content: ""; position: absolute; inset: 0; background: var(--accent); animation: ping 1.6s cubic-bezier(0, 0, .2, 1) infinite; }
   @keyframes ping { 75%, 100% { transform: scale(2.4); opacity: 0; } }
 
-  /* Menu du site, la page courante est allumée */
+  /* Sommaire avec section active */
   .toc { margin-top: var(--space-12); }
   .toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
   .toc a { display: flex; align-items: center; gap: var(--space-4); padding: 6px 0; color: var(--ink-soft); text-decoration: none; font-size: 14px; font-weight: 500; }
   .toc a::before { content: ""; width: 24px; height: 1px; background: var(--ink-soft); transition: width .25s, background-color .25s; }
-  .toc a:hover, .toc a[aria-current="page"] { color: var(--surface); }
-  .toc a[aria-current="page"]::before { width: 72px; height: 2px; background: var(--accent); }
+  .toc a:hover, .toc a.current { color: var(--surface); }
+  .toc a.current::before { width: 72px; height: 2px; background: var(--accent); }
 
   .socials { margin-top: auto; padding-top: var(--space-6); display: flex; gap: var(--space-4); border-top: 1px solid var(--ink-line); }
   .socials a { color: var(--ink-text); display: inline-flex; }
@@ -89,7 +111,7 @@ const Name = current === 'home' ? 'h1' : 'p';
     .toc { margin-top: var(--space-6); }
     .toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-4); }
     .toc a::before { width: 12px; }
-    .toc a[aria-current="page"]::before { width: 24px; }
+    .toc a.current::before { width: 24px; }
     .socials { margin-top: var(--space-6); }
   }
   @media (max-width: 560px) {
@@ -99,3 +121,27 @@ const Name = current === 'home' ? 'h1' : 'p';
     .dot::after { animation: none; }
   }
 </style>
+
+<script>
+  // Accueil : la section visible s'allume dans le sommaire
+  const toc = document.querySelector('[data-spy]');
+  if (toc) {
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+    const sections = links
+      .map((link) => document.getElementById(link.hash.slice(1)))
+      .filter((s): s is HTMLElement => s !== null);
+
+    const update = () => {
+      if (!sections.length) return;
+      let current = sections[0];
+      const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+      if (atBottom) current = sections[sections.length - 1];
+      else for (const s of sections) if (s.getBoundingClientRect().top < innerHeight * 0.35) current = s;
+      for (const link of links) link.classList.toggle('current', link.hash === `#${current.id}`);
+    };
+
+    addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+    update();
+  }
+</script>

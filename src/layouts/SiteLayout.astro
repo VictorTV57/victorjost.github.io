@@ -3,7 +3,7 @@ import Contact from '../components/Contact.astro';
 import Sidebar from '../components/Sidebar.astro';
 import { site } from '../data/site';
 import { otherLang, type Lang } from '../i18n';
-import { href, type Route } from '../i18n/routes';
+import { href, type Route, type TocId } from '../i18n/routes';
 import { useUi } from '../i18n/ui';
 import Base from './Base.astro';
 
@@ -13,9 +13,13 @@ interface Props {
   /** Titre de la page, sans le nom du site. Absent sur l'accueil. */
   title?: string;
   description?: string;
+  /** Entrée du sommaire à allumer, si elle ne se déduit pas de la page. */
+  active?: TocId;
+  /** Bloc contact en bas de page. L'accueil le place lui-même entre ses sections. */
+  contact?: boolean;
 }
 
-const { lang, route, title, description = site.description[lang] } = Astro.props;
+const { lang, route, title, description = site.description[lang], active, contact = true } = Astro.props;
 const ui = useUi(lang);
 const alternates = {
   fr: href('fr', route.section, route.id),
@@ -24,15 +28,17 @@ const alternates = {
 ---
 <Base lang={lang} title={title ? `${title} — ${site.name}` : site.title} description={description} alternates={alternates}>
   <div class="layout">
-    <Sidebar lang={lang} current={route.section} alternate={alternates[otherLang(lang)]} />
+    <Sidebar lang={lang} current={route.section} active={active} alternate={alternates[otherLang(lang)]} />
 
     <main class="content">
       <div class="content-inner">
         <slot />
 
-        <section id="contact">
-          <Contact lang={lang} />
-        </section>
+        {contact && (
+          <section id="contact">
+            <Contact lang={lang} />
+          </section>
+        )}
 
         <footer>© {new Date().getFullYear()} {site.name} · {ui.footer}</footer>
       </div>

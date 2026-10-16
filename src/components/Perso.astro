@@ -5,11 +5,9 @@ import { useUi } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
-  /** Accueil : seulement les jeux du moment. */
-  compact?: boolean;
 }
 
-const { lang, compact = false } = Astro.props;
+const { lang } = Astro.props;
 const ui = useUi(lang);
 const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
 ---
@@ -40,8 +38,6 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   <a class="more-link" href={steamUrl} target="_blank" rel="noopener">{ui.beyond.steam} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
 </div>
 
-{!compact && (
-<>
 <div class="perso-block reveal">
   <h3 class="cat-title">{ui.beyond.favGames}</h3>
   <ol class="covers">
@@ -90,8 +86,6 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   </div>
   <a class="more-link" href={spotifyUrl} target="_blank" rel="noopener">{ui.beyond.listen} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
 </div>
-</>
-)}
 
 <style>
   .perso-block { margin-bottom: var(--space-12); }
