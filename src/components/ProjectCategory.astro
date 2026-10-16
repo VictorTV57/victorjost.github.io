@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
 import ProjectCard from './ProjectCard.astro';
 
 interface Props {
@@ -8,18 +9,57 @@ interface Props {
   title: string;
   /** Déjà triés par `order`. */
   projects: CollectionEntry<'projects'>[];
+  /** Accueil : le premier projet s'affiche, les suivants vont dans un repli « Voir N autres projets ». */
+  fold?: boolean;
 }
 
-const { lang, title, projects } = Astro.props;
+const { lang, title, projects, fold = false } = Astro.props;
+const ui = useUi(lang);
+const [first, ...rest] = projects;
 ---
-{projects.length > 0 && (
+{first && (
   <div class="cat">
     <h3 class="cat-title">{title}</h3>
-    {projects.map((project) => <ProjectCard lang={lang} project={project} reveal />)}
+    {fold ? (
+      <>
+        <ProjectCard lang={lang} project={first} reveal />
+        {rest.length > 0 && (
+          <details class="fold">
+            <summary>
+              <span class="when-closed">{ui.projects.more(rest.length)}</span><span class="when-open">{ui.projects.hide}</span>
+              <svg aria-hidden="true"><use href="#chev" /></svg>
+            </summary>
+            <div class="fold-body">
+              {rest.map((project) => <ProjectCard lang={lang} project={project} />)}
+            </div>
+          </details>
+        )}
+      </>
+    ) : (
+      projects.map((project) => <ProjectCard lang={lang} project={project} reveal />)
+    )}
   </div>
 )}
 
 <style>
   .cat { margin-bottom: var(--space-12); }
   .cat:last-child { margin-bottom: 0; }
+
+  /* Repli « Voir d'autres projets » */
+  .fold { margin-top: var(--space-4); }
+  .fold summary {
+    list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
+    font: 500 14px/20px var(--font-sans); color: var(--ink); padding: 6px 12px;
+    background: var(--surface); border: 1px solid var(--ink-muted); border-radius: var(--radius-sm);
+  }
+  .fold summary::-webkit-details-marker { display: none; }
+  .fold summary:hover { border-color: var(--ink); }
+  .fold summary svg { width: 16px; height: 16px; transition: transform .25s; }
+  .fold[open] summary svg { transform: rotate(180deg); }
+  .fold .when-open { display: none; }
+  .fold[open] .when-open { display: inline; }
+  .fold[open] .when-closed { display: none; }
+  .fold-body { padding-top: var(--space-4); }
+  .fold::details-content { block-size: 0; overflow: hidden; transition: block-size .45s var(--ease-out), content-visibility .45s allow-discrete; }
+  .fold[open]::details-content { block-size: auto; }
 </style>

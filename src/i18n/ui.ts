@@ -28,6 +28,8 @@ const fr = {
   projects: {
     seeProject: 'Voir le projet',
     seeAll: (n: number) => `Voir les ${n} projets`,
+    more: (n: number) => (n === 1 ? 'Voir 1 autre projet' : `Voir ${n} autres projets`),
+    hide: 'Masquer',
     viewCode: 'Voir le code',
     notePhotos: "Le code de ce projet n'est pas public : voici le projet en images.",
     notePrivate: 'Le code de ce projet est privé.',
@@ -108,6 +110,8 @@ const en: typeof fr = {
   projects: {
     seeProject: 'View project',
     seeAll: (n: number) => `See all ${n} projects`,
+    more: (n: number) => (n === 1 ? 'See 1 more project' : `See ${n} more projects`),
+    hide: 'Hide',
     viewCode: 'View the code',
     notePhotos: "This project's code isn't public: here it is in pictures.",
     notePrivate: "This project's code is private.",
