@@ -1,0 +1,29 @@
+---
+import { interests, places } from '../data/interests';
+import { tr, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+<div class="interests reveal">
+  {interests.map((item) => (
+    <div class="interest">
+      <h3>{tr(item.title, lang)}</h3>
+      <p>{tr(item.text, lang)}</p>
+      {item.places && <ul class="tags">{places.map((place) => <li>{place}</li>)}</ul>}
+    </div>
+  ))}
+</div>
+
+<style>
+  .interests { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+  .interest { background: var(--surface); border: 1px solid var(--line); padding: var(--space-6); }
+  h3 { margin: 0 0 var(--space-2); font-size: 16px; display: flex; align-items: center; gap: var(--space-2); }
+  h3::before { content: ""; width: 8px; height: 8px; background: var(--brand); flex-shrink: 0; }
+  p { margin: 0; }
+  .tags { margin-top: var(--space-4); }
+  @media (max-width: 560px) { .interests { grid-template-columns: 1fr; } }
+</style>

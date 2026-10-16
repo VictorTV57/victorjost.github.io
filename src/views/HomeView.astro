@@ -1,12 +1,14 @@
 ---
 import Contact from '../components/Contact.astro';
 import Hackathons from '../components/Hackathons.astro';
+import Interests from '../components/Interests.astro';
 import Perso from '../components/Perso.astro';
 import ProjectCategory from '../components/ProjectCategory.astro';
 import Skills from '../components/Skills.astro';
 import Timeline from '../components/Timeline.astro';
 import { about } from '../data/about';
 import { experience, formation } from '../data/parcours';
+import { site } from '../data/site';
 import type { Lang } from '../i18n';
 import { href } from '../i18n/routes';
 import { useUi } from '../i18n/ui';
@@ -46,6 +48,12 @@ const hackathons = (await getHackathons()).slice(0, 2);
     <p class="muted section-intro">{ui.hackathons.intro}</p>
     <Hackathons lang={lang} items={hackathons} />
     <a class="more-link" href={href(lang, 'hackathons')}>{ui.hackathons.seeAll} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  </section>
+
+  <section id="interets">
+    <h2>{ui.nav.interests}</h2>
+    <p class="muted section-intro">{site.availability[lang]}.</p>
+    <Interests lang={lang} />
   </section>
 
   <section id="contact">

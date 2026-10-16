@@ -17,7 +17,7 @@ const SLUGS: Record<Section, Localized> = {
 };
 
 /** Ancres des sections de l'accueil, dans leur ordre d'apparition : ce sont les entrées du sommaire. */
-export type TocId = 'a-propos' | 'projets' | 'hackathons' | 'contact' | 'experience' | 'formation' | 'competences' | 'perso';
+export type TocId = 'a-propos' | 'projets' | 'hackathons' | 'interets' | 'contact' | 'experience' | 'formation' | 'competences' | 'perso';
 
 export interface Route {
   section: Section;
