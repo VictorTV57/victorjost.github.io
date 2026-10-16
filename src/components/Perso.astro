@@ -17,7 +17,7 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   <h3 class="cat-title">{ui.beyond.nowPlaying}</h3>
   <ul class="now-playing">
     {nowPlaying.map((game) => (
-      <li>
+      <li class="lift">
         <span class="cover" style={swatch(game)} aria-hidden="true"></span>
         <div class="np-info">
           <strong>{tr(game.title, lang)}</strong>
@@ -47,7 +47,7 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   <ol class="covers">
     {favoriteGames.map((game, i) => (
       <li>
-        <span class="poster" style={swatch(game)} aria-hidden="true"><span class="rank">{i + 1}</span></span>
+        <span class="poster lift" style={swatch(game)} aria-hidden="true"><span class="rank">{i + 1}</span></span>
         <strong>{tr(game.title, lang)}</strong>
         <span class="muted">{tr(game.info, lang)}</span>
       </li>
@@ -60,7 +60,7 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   <ul class="covers films">
     {favoriteFilms.map((film) => (
       <li>
-        <span class="poster" style={swatch(film)} aria-hidden="true"></span>
+        <span class="poster lift" style={swatch(film)} aria-hidden="true"></span>
         <strong>{tr(film.title, lang)}</strong>
         <span class="muted">{tr(film.info, lang)}</span>
       </li>
@@ -80,7 +80,7 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
     </div>
     <ol class="tracks">
       {playlist.tracks.map((track, i) => (
-        <li>
+        <li class="lift dark">
           <span class="t-num">{i + 1}</span>
           <span class="t-name"><strong>{tr(track.title, lang)}</strong><span class="muted">{tr(track.artist, lang)}</span></span>
           <span class="t-len">{track.length}</span>
@@ -98,11 +98,19 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   .perso-block:last-child { margin-bottom: 0; }
   .more-link { margin-top: var(--space-4); }
 
+  /* Survol : le bloc se soulève légèrement et projette une ombre en dessous */
+  .lift { position: relative; transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out), background-color .2s; }
+  .lift:hover, .covers li:hover .lift { z-index: 1; transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+  .lift.dark:hover { transform: translateY(-2px); background: var(--ink-raised); box-shadow: var(--shadow-lift-dark); }
+  @media (prefers-reduced-motion: reduce) {
+    .lift:hover, .covers li:hover .lift, .lift.dark:hover { transform: none; }
+  }
+
   /* Visuels provisoires : à remplacer par de vraies jaquettes (<img>) */
   .cover, .poster, .pl-cover { display: block; background: linear-gradient(135deg, var(--c1) 0 50%, var(--c2) 50% 100%); }
 
   .now-playing { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); }
-  .now-playing li { display: grid; grid-template-columns: 48px 1fr auto; gap: var(--space-4); align-items: center; padding: var(--space-4); border-bottom: 1px solid var(--line); }
+  .now-playing li { display: grid; grid-template-columns: 48px 1fr auto; gap: var(--space-4); align-items: center; padding: var(--space-4); border-bottom: 1px solid var(--line); background: var(--surface); }
   .now-playing li:last-child { border-bottom: 0; }
   .now-playing .cover { width: 48px; height: 48px; }
   .np-info { display: flex; flex-direction: column; min-width: 0; }
@@ -114,7 +122,7 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   .covers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
   .covers.films { grid-template-columns: repeat(5, 1fr); }
   .covers li { display: flex; flex-direction: column; min-width: 0; }
-  .covers .poster { position: relative; aspect-ratio: 3 / 4; border: 1px solid var(--line); margin-bottom: var(--space-2); }
+  .covers .poster { aspect-ratio: 3 / 4; border: 1px solid var(--line); margin-bottom: var(--space-2); }
   .covers.films .poster { aspect-ratio: 2 / 3; }
   .covers strong { font-size: 15px; line-height: 20px; }
   .covers .muted { font-size: 13px; line-height: 18px; }
@@ -125,9 +133,9 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
   .pl-head > div { display: flex; flex-direction: column; }
   .pl-cover { width: 64px; height: 64px; --c1: var(--brand); --c2: var(--accent); flex-shrink: 0; }
   .playlist .muted { color: var(--ink-soft); font-size: 14px; }
-  .tracks { list-style: none; margin: 0; padding: 0; }
-  .tracks li { display: grid; grid-template-columns: 24px 1fr auto; gap: var(--space-4); align-items: center; padding: 10px 0; border-bottom: 1px solid var(--ink-line); }
-  .tracks li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .tracks { list-style: none; margin: 0 calc(-1 * var(--space-2)); padding: 0; }
+  .tracks li { display: grid; grid-template-columns: 24px 1fr auto; gap: var(--space-4); align-items: center; padding: 10px var(--space-2); border-bottom: 1px solid var(--ink-line); }
+  .tracks li:last-child { border-bottom: 0; }
   .t-num, .t-len { color: var(--ink-soft); font-size: 14px; }
   .t-name { display: flex; flex-direction: column; min-width: 0; }
   .t-name strong { font-weight: 500; }
