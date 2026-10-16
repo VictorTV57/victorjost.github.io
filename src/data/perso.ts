@@ -15,6 +15,8 @@ export interface NowPlaying extends Placeholder {
   /** Texte à droite, ex. « Tous les jours ». */
   time?: Text;
   achievements?: { done: number; total: number };
+  /** Masqué du site sans être supprimé. */
+  hidden?: boolean;
 }
 
 export interface Cover extends Placeholder {
@@ -28,14 +30,14 @@ export interface Track {
   length: string;
 }
 
-export const steamUrl = 'https://steamcommunity.com/id/TON-PROFIL';
-export const spotifyUrl = 'https://open.spotify.com/user/TON-PROFIL';
+export const steamUrl = 'https://steamcommunity.com/profiles/76561199100609206/';
+export const spotifyUrl = 'https://open.spotify.com/user/315fxifq3ipkhdz65c7jawu2luui';
 
 const gameTitle = { fr: 'Titre du jeu', en: 'Game title' };
-const filmTitle = { fr: 'Titre du film', en: 'Film title' };
+const filmTitle = { fr: 'Titre du film ou de la vidéo', en: 'Film or video title' };
 const platform = { fr: 'Plateforme', en: 'Platform' };
 const year = { fr: 'Année', en: 'Year' };
-const director = { fr: 'Réalisateur, année', en: 'Director, year' };
+const director = { fr: 'Réalisateur ou chaîne YouTube, année', en: 'Director or YouTube channel, year' };
 
 export const nowPlaying: NowPlaying[] = [
   {
@@ -43,6 +45,7 @@ export const nowPlaying: NowPlaying[] = [
     info: { fr: 'PC · je développe aussi dessus', en: 'PC · I also develop on it' },
     time: { fr: 'Tous les jours', en: 'Every day' },
     c1: '#1F4FE0', c2: '#0E1A2B',
+    hidden: true, // retiré temporairement : passer à false (ou supprimer la ligne) pour le réafficher
   },
   { title: gameTitle, info: platform, achievements: { done: 12, total: 26 }, c1: '#F5B800', c2: '#0E1A2B' },
   { title: gameTitle, info: platform, achievements: { done: 40, total: 50 }, c1: '#56637A', c2: '#DCE2EA' },
@@ -56,6 +59,7 @@ export const favoriteGames: Cover[] = [
   { title: gameTitle, info: year, c1: '#56637A', c2: '#0E1A2B' },
 ];
 
+/** Films et vidéos (YouTube ou autre). */
 export const favoriteFilms: Cover[] = [
   { title: filmTitle, info: director, c1: '#0E1A2B', c2: '#F5B800' },
   { title: filmTitle, info: director, c1: '#1F4FE0', c2: '#0E1A2B' },

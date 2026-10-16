@@ -14,7 +14,7 @@ const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
 <div class="perso-block reveal">
   <h3 class="cat-title">{ui.beyond.nowPlaying}</h3>
   <ul class="now-playing">
-    {nowPlaying.map((game) => (
+    {nowPlaying.filter((game) => !game.hidden).map((game) => (
       <li class="lift">
         <span class="cover" style={swatch(game)} aria-hidden="true"></span>
         <div class="np-info">
