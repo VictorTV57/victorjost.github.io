@@ -1,18 +1,21 @@
 ---
 import type { Step } from '../data/parcours';
+import { tr, type Lang } from '../i18n';
+import { href } from '../i18n/routes';
 
 interface Props {
+  lang: Lang;
   items: Step[];
 }
 
-const { items } = Astro.props;
+const { lang, items } = Astro.props;
 ---
 <ol class="timeline">
   {items.map((step) => (
     <li class:list={['reveal', { now: step.now }]}>
-      <span class="when">{step.when}</span>
-      <h3>{step.title}</h3>
-      <p>{step.text}</p>
+      <span class="when">{tr(step.when, lang)}</span>
+      <h3><a href={href(lang, 'journey', step.id)}>{tr(step.title, lang)}</a></h3>
+      <p>{tr(step.text, lang)}</p>
     </li>
   ))}
 </ol>
@@ -26,5 +29,7 @@ const { items } = Astro.props;
   li.now::before { background: var(--brand); }
   .when { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
   h3 { margin: 2px 0 0; font-size: 18px; line-height: 24px; }
+  h3 a { color: inherit; text-decoration: none; }
+  h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
   p { margin: 4px 0 0; color: var(--ink-muted); }
 </style>

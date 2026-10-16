@@ -1,10 +1,4 @@
 ---
 import ErrorPage from '../layouts/ErrorPage.astro';
 ---
-<ErrorPage
-  code="504"
-  title="Délai dépassé"
-  message="Le serveur a mis trop de temps à répondre. C'est souvent passager : réessaie dans un instant."
-  variant="timeout"
-  actions={['retry', 'home']}
-/>
+<ErrorPage code="504" lang="fr" />

@@ -1,0 +1,22 @@
+---
+import Hackathons from '../components/Hackathons.astro';
+import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { getHackathons } from '../lib/collections';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = useUi(lang);
+const hackathons = await getHackathons();
+---
+<SiteLayout lang={lang} route={{ section: 'hackathons' }} title={ui.nav.hackathons}>
+  <section>
+    <h1 class="page-title">{ui.nav.hackathons}</h1>
+    <p class="muted section-intro">{ui.hackathons.intro}</p>
+    <Hackathons lang={lang} items={hackathons} />
+  </section>
+</SiteLayout>

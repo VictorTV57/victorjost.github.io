@@ -2,72 +2,80 @@
 import '../styles/tokens.css';
 import Head from '../components/Head.astro';
 import PixelCode from '../components/PixelCode.astro';
-import { site, url } from '../data/site';
-import type { Variant } from '../lib/pixel-code';
-
-type Action = 'home' | 'projects' | 'contact' | 'retry';
+import { site } from '../data/site';
+import { languages, type Lang } from '../i18n';
+import { ERROR_UI, ERRORS, type ErrorAction, type ErrorCode } from '../i18n/errors';
+import { href } from '../i18n/routes';
 
 interface Props {
-  code: string;
-  title: string;
-  message: string;
-  variant: Variant;
-  /** Le premier bouton est plein, le second en contour. */
-  actions: [Action, Action];
-  /** Affiche l'adresse demandée sous le message (404). */
-  showPath?: boolean;
+  code: ErrorCode;
+  lang: Lang;
+  /**
+   * Contient le texte des deux langues et affiche celle de l'adresse demandée (/en/… → anglais).
+   * Pour le 404 : GitHub Pages sert le même 404.html pour tout le site.
+   */
+  bilingual?: boolean;
 }
 
-const { code, title, message, variant, actions, showPath = false } = Astro.props;
+const { code, lang, bilingual = false } = Astro.props;
+const { variant, actions, showPath = false, title, message } = ERRORS[code];
+const shown = bilingual ? languages : [lang];
 
-const ICONS: Record<Action, string> = {
+const ICONS: Record<ErrorAction, string> = {
   home: '<path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/>',
   projects: '<rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/>',
   contact: '<rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/>',
   retry: '<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/>',
 };
 
-const LINKS: Record<Exclude<Action, 'retry'>, { label: string; href: string }> = {
-  home: { label: "Retour à l'accueil", href: url() },
-  projects: { label: 'Voir les projets', href: url('#projets') },
-  contact: { label: 'Me contacter', href: `mailto:${site.email}` },
-};
+const linkFor = (action: Exclude<ErrorAction, 'retry'>, l: Lang) =>
+  action === 'home' ? href(l, 'home') : action === 'projects' ? href(l, 'projects') : `mailto:${site.email}`;
 
+const pageTitle = (l: Lang) => `${code} — ${title[l]} | ${site.name}`;
 const host = Astro.site?.host ?? 'victorjost.github.io';
 ---
 <!doctype html>
-<html lang="fr">
+<html
+  lang={lang}
+  data-bilingual={bilingual ? '' : undefined}
+  data-title-fr={bilingual ? pageTitle('fr') : undefined}
+  data-title-en={bilingual ? pageTitle('en') : undefined}
+>
   <head>
-    <Head title={`${code} — ${title} | ${site.name}`}>
+    <Head title={pageTitle(lang)}>
       <meta name="robots" content="noindex" />
     </Head>
   </head>
   <body>
     <header class="top">
-      <a class="logo" href={url()}><span class="logo-mark" aria-hidden="true">VJ</span>{site.name}</a>
+      {shown.map((l) => (
+        <a class="logo" href={href(l, 'home')} data-lang={l} hidden={l !== lang}><span class="logo-mark" aria-hidden="true">VJ</span>{site.name}</a>
+      ))}
     </header>
 
     <main>
       <PixelCode code={code} variant={variant} />
-      <div class="copy">
-        <span class="code">Erreur {code}</span>
-        <h1>{title}</h1>
-        <p>{message}</p>
-        {showPath && <code class="path" data-path hidden></code>}
-        <div class="actions">
-          {actions.map((action, i) => {
-            const cls = i === 0 ? 'btn' : 'btn ghost';
-            const icon = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true" set:html={ICONS[action]} />;
-            return action === 'retry'
-              ? <button type="button" class={cls} data-retry>{icon}Réessayer</button>
-              : <a class={cls} href={LINKS[action].href}>{icon}{LINKS[action].label}</a>;
-          })}
+      {shown.map((l) => (
+        <div class="copy" data-lang={l} lang={l} hidden={l !== lang}>
+          <span class="code">{ERROR_UI.error[l]} {code}</span>
+          <h1>{title[l]}</h1>
+          <p>{message[l]}</p>
+          {showPath && <code class="path" data-path hidden></code>}
+          <div class="actions">
+            {actions.map((action, i) => {
+              const cls = i === 0 ? 'btn' : 'btn ghost';
+              const icon = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true" set:html={ICONS[action]} />;
+              return action === 'retry'
+                ? <button type="button" class={cls} data-retry>{icon}{ERROR_UI.retry[l]}</button>
+                : <a class={cls} href={linkFor(action, l)}>{icon}{ERROR_UI[action][l]}</a>;
+            })}
+          </div>
         </div>
-      </div>
+      ))}
     </main>
 
     <footer>
-      <span>Erreur {code} sur {host}</span>
+      {shown.map((l) => <span data-lang={l} hidden={l !== lang}>{ERROR_UI.error[l]} {code} {ERROR_UI.on[l]} {host}</span>)}
       <a href={`mailto:${site.email}`}>{site.email}</a>
     </footer>
   </body>
@@ -76,6 +84,7 @@ const host = Astro.site?.host ?? 'victorjost.github.io';
 <style is:global>
   :root { --cell: 24px; } /* une case de la grille = un pixel du chiffre */
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { height: 100%; }
   body {
     margin: 0; font: 400 16px/24px var(--font-sans); color: var(--ink);
@@ -105,7 +114,6 @@ const host = Astro.site?.host ?? 'victorjost.github.io';
   h1 { margin: var(--space-2) 0 var(--space-4); font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -.02em; }
   p { margin: 0 0 var(--space-4); font-size: 18px; line-height: 28px; }
   .path { display: inline-block; margin: 0 0 var(--space-4); font: 400 14px/20px var(--font-mono); color: var(--ink-muted); background: var(--surface); border: 1px solid var(--line); padding: 4px 10px; max-width: 100%; overflow-wrap: anywhere; }
-  .path[hidden] { display: none; }
   .actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-6); }
   .btn {
     display: inline-flex; align-items: center; gap: var(--space-2); white-space: nowrap; cursor: pointer;
@@ -133,17 +141,28 @@ const host = Astro.site?.host ?? 'victorjost.github.io';
 </style>
 
 <script>
-  // 404 : affiche l'adresse demandée
-  const path = document.querySelector<HTMLElement>('[data-path]');
-  if (path) {
-    let requested = location.pathname + location.search;
-    try { requested = decodeURIComponent(requested); } catch { /* adresse mal encodée : on l'affiche telle quelle */ }
-    if (requested !== '/' && !requested.endsWith('.html')) {
+  const root = document.documentElement;
+
+  // 404 bilingue : la langue suit l'adresse demandée
+  if (root.dataset.bilingual !== undefined) {
+    const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+    const lang = location.pathname.startsWith(`${base}en/`) ? 'en' : 'fr';
+    for (const el of document.querySelectorAll<HTMLElement>('[data-lang]')) el.hidden = el.dataset.lang !== lang;
+    root.lang = lang;
+    const title = lang === 'en' ? root.dataset.titleEn : root.dataset.titleFr;
+    if (title) document.title = title;
+  }
+
+  // Affiche l'adresse demandée
+  let requested = location.pathname + location.search;
+  try { requested = decodeURIComponent(requested); } catch { /* adresse mal encodée : on l'affiche telle quelle */ }
+  if (requested !== '/' && !requested.endsWith('.html')) {
+    for (const path of document.querySelectorAll<HTMLElement>('[data-path]')) {
       path.textContent = requested;
       path.hidden = false;
     }
   }
 
   // Bouton « Réessayer »
-  document.querySelector('[data-retry]')?.addEventListener('click', () => location.reload());
+  for (const button of document.querySelectorAll('[data-retry]')) button.addEventListener('click', () => location.reload());
 </script>

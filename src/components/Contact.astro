@@ -1,13 +1,20 @@
 ---
 import { site } from '../data/site';
+import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const ui = useUi(Astro.props.lang);
 ---
 <div class="contact-box reveal">
-  <h2>On en parle ?</h2>
-  <p>Une question sur un projet, une opportunité de stage ? Écris-moi, je réponds vite.</p>
+  <h2>{ui.contact.title}</h2>
+  <p>{ui.contact.text}</p>
   <div class="actions">
     <a class="btn" href={`mailto:${site.email}`}><svg aria-hidden="true"><use href="#mail" /></svg>{site.email}</a>
-    <a class="btn ghost" href={site.linkedin} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#in" /></svg>LinkedIn</a>
-  </div>
+    <a class="btn ghost" href={site.linkedin} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#in" /></svg>LinkedIn</a>  </div>
 </div>
 
 <style>

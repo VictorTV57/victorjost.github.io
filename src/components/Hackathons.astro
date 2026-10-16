@@ -1,29 +1,37 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { tr, type Lang } from '../i18n';
+import { href } from '../i18n/routes';
 
 interface Props {
+  lang: Lang;
   /** Déjà triés par `order`. */
   items: CollectionEntry<'hackathons'>[];
 }
 
-const { items } = Astro.props;
+const { lang, items } = Astro.props;
 ---
 <ol class="hacks">
-  {items.map(({ data }) => (
+  {items.map(({ id, data }) => (
     <li class="hack reveal">
-      <span class="hack-date">{data.date}</span>
-      <h3>{data.title}</h3>
-      <p>{data.summary}</p>
-      <span class="hack-result">{data.result}</span>
+      <span class="hack-date">{tr(data.date, lang)}</span>
+      <h3><a href={href(lang, 'hackathons', id)}>{tr(data.title, lang)}</a></h3>
+      <p>{tr(data.summary, lang)}</p>
+      <span class="hack-result">{tr(data.result, lang)}</span>
     </li>
   ))}
 </ol>
 
 <style>
   .hacks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
-  .hack { background: var(--surface); border: 1px solid var(--line); padding: var(--space-6); display: flex; flex-direction: column; gap: 4px; }
+  .hack { position: relative; background: var(--surface); border: 1px solid var(--line); padding: var(--space-6); display: flex; flex-direction: column; gap: 4px; transition: border-color .15s; }
+  .hack:hover { border-color: var(--ink-muted); }
   .hack-date { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
   h3 { margin: 0; font-size: 18px; line-height: 24px; }
+  h3 a { color: inherit; text-decoration: none; }
+  /* Toute la carte est cliquable */
+  h3 a::after { content: ""; position: absolute; inset: 0; }
+  .hack:hover h3 a { text-decoration: underline; text-underline-offset: 3px; }
   p { margin: 4px 0 0; }
   .hack-result { margin-top: auto; padding-top: var(--space-4); align-self: flex-start; font-size: 13px; font-weight: 700; }
   .hack-result::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--accent); margin-right: 8px; }

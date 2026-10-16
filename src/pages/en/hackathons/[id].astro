@@ -1,0 +1,11 @@
+---
+import type { InferGetStaticPropsType } from 'astro';
+import { hackathonPaths } from '../../../lib/collections';
+import HackathonView from '../../../views/HackathonView.astro';
+
+export const getStaticPaths = hackathonPaths;
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { hackathon } = Astro.props;
+---
+<HackathonView lang="en" hackathon={hackathon} />

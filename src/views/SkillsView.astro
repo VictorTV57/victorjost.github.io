@@ -1,0 +1,19 @@
+---
+import Skills from '../components/Skills.astro';
+import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = useUi(lang);
+---
+<SiteLayout lang={lang} route={{ section: 'skills' }} title={ui.nav.skills}>
+  <section>
+    <h1 class="page-title">{ui.nav.skills}</h1>
+    <Skills lang={lang} />
+  </section>
+</SiteLayout>

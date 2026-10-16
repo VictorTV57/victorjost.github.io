@@ -1,5 +1,14 @@
 ---
 // Explorateur Imperium : un même appel, moteur par moteur.
+import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const ui = useUi(Astro.props.lang);
+
 interface Row {
   engine: string;
   lang: string;
@@ -12,7 +21,7 @@ const engines = [
   { id: 'Unity', label: 'Unity' },
   { id: 'Unreal', label: 'Unreal' },
   { id: 'Godot', label: 'Godot' },
-  { id: 'Maison', label: 'Moteur maison' },
+  { id: 'Maison', label: ui.imperium.custom },
   { id: 'Web', label: 'Web' },
 ];
 
@@ -35,7 +44,7 @@ const initial = engines[0].id;
 ---
 <div class="imp" data-imperium>
   <div class="imp-head">
-    <span class="imp-label" id="imp-label">Régler l'heure à 18 h avec Hora</span>
+    <span class="imp-label" id="imp-label">{ui.imperium.label}</span>
   </div>
   <div class="imp-engines" role="tablist" aria-labelledby="imp-label">
     {engines.map(({ id, label }) => (
@@ -43,7 +52,7 @@ const initial = engines[0].id;
     ))}
   </div>
   <table class="imp-table" id="imp-table" role="tabpanel">
-    <thead><tr><th scope="col">Langage</th><th scope="col">Emplacement</th><th scope="col">Appel</th></tr></thead>
+    <thead><tr><th scope="col">{ui.imperium.language}</th><th scope="col">{ui.imperium.location}</th><th scope="col">{ui.imperium.call}</th></tr></thead>
     <tbody>
       {rows.map((r) => (
         <tr data-engine={r.engine} hidden={r.engine !== initial}>

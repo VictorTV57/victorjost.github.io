@@ -1,0 +1,26 @@
+---
+import Timeline from '../components/Timeline.astro';
+import { experience, formation } from '../data/parcours';
+import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = useUi(lang);
+---
+<SiteLayout lang={lang} route={{ section: 'journey' }} title={ui.nav.journey}>
+  <section>
+    <h1 class="page-title">{ui.nav.journey}</h1>
+    <h2>{ui.journey.experience}</h2>
+    <Timeline lang={lang} items={experience} />
+  </section>
+
+  <section>
+    <h2>{ui.journey.formation}</h2>
+    <Timeline lang={lang} items={formation} />
+  </section>
+</SiteLayout>

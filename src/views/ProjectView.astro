@@ -1,0 +1,40 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import DetailHeader from '../components/DetailHeader.astro';
+import Gallery from '../components/Gallery.astro';
+import { projectExtras } from '../components/project-extras';
+import { tr, type Lang } from '../i18n';
+import { href } from '../i18n/routes';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+interface Props {
+  lang: Lang;
+  project: CollectionEntry<'projects'>;
+}
+
+const { lang, project } = Astro.props;
+const ui = useUi(lang);
+const { title, kind, summary, description, tags, status, repo, photos } = project.data;
+const Extra = projectExtras[project.id];
+const note = photos ? ui.projects.notePhotos : project.data.private ? ui.projects.notePrivate : ui.projects.noteSoon;
+---
+<SiteLayout lang={lang} route={{ section: 'projects', id: project.id }} title={tr(title, lang)} description={tr(summary, lang)}>
+  <section>
+    <DetailHeader back={{ href: href(lang, 'projects'), label: ui.projects.back }} kicker={tr(kind, lang)} title={tr(title, lang)}>
+      <p>{tr(description ?? summary, lang)}</p>
+      {status && <span class="status">{tr(status, lang)}</span>}
+      <ul class="tags">{tags.map((tag) => <li>{tr(tag, lang)}</li>)}</ul>
+      {repo ? (
+        <div class="actions">
+          <a class="btn" href={repo} target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#gh" /></svg>{ui.projects.viewCode}</a>
+        </div>
+      ) : (
+        <p class="sub-note"><svg aria-hidden="true"><use href={project.data.private ? '#lock' : '#gh'} /></svg>{note}</p>
+      )}
+    </DetailHeader>
+    {Extra && <Extra lang={lang} />}
+  </section>
+
+  {photos && <Gallery lang={lang} title={ui.projects.photos} photos={photos} />}
+</SiteLayout>

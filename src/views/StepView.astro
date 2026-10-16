@@ -1,0 +1,25 @@
+---
+import DetailHeader from '../components/DetailHeader.astro';
+import type { Step } from '../data/parcours';
+import { tr, type Lang } from '../i18n';
+import { href } from '../i18n/routes';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+interface Props {
+  lang: Lang;
+  step: Step;
+}
+
+const { lang, step } = Astro.props;
+const ui = useUi(lang);
+const kind = step.kind === 'experience' ? ui.journey.experience : ui.journey.formation;
+---
+<SiteLayout lang={lang} route={{ section: 'journey', id: step.id }} title={tr(step.title, lang)} description={tr(step.text, lang)}>
+  <section>
+    <DetailHeader back={{ href: href(lang, 'journey'), label: ui.journey.back }} kicker={`${kind} · ${tr(step.when, lang)}`} title={tr(step.title, lang)}>
+      <p>{tr(step.text, lang)}</p>
+      {step.now && <span class="status">{ui.journey.now}</span>}
+    </DetailHeader>
+  </section>
+</SiteLayout>

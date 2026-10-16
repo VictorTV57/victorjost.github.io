@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import DetailHeader from '../components/DetailHeader.astro';
+import { tr, type Lang } from '../i18n';
+import { href } from '../i18n/routes';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+interface Props {
+  lang: Lang;
+  hackathon: CollectionEntry<'hackathons'>;
+}
+
+const { lang, hackathon } = Astro.props;
+const ui = useUi(lang);
+const { date, title, summary, description, result, tags } = hackathon.data;
+---
+<SiteLayout lang={lang} route={{ section: 'hackathons', id: hackathon.id }} title={tr(title, lang)} description={tr(summary, lang)}>
+  <section>
+    <DetailHeader back={{ href: href(lang, 'hackathons'), label: ui.hackathons.back }} kicker={tr(date, lang)} title={tr(title, lang)}>
+      <p>{tr(description ?? summary, lang)}</p>
+      <p class="result">{tr(result, lang)}</p>
+      {tags.length > 0 && <ul class="tags">{tags.map((tag) => <li>{tr(tag, lang)}</li>)}</ul>}
+    </DetailHeader>
+  </section>
+</SiteLayout>
+
+<style>
+  .result { display: inline-flex; align-items: center; gap: var(--space-2); font-size: 14px; font-weight: 700; }
+  .result::before { content: ""; width: 8px; height: 8px; background: var(--accent); }
+</style>

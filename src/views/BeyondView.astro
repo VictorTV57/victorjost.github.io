@@ -1,0 +1,20 @@
+---
+import Perso from '../components/Perso.astro';
+import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = useUi(lang);
+---
+<SiteLayout lang={lang} route={{ section: 'beyond' }} title={ui.nav.beyond}>
+  <section>
+    <h1 class="page-title">{ui.nav.beyond}</h1>
+    <p class="muted section-intro">{ui.beyond.intro}</p>
+    <Perso lang={lang} />
+  </section>
+</SiteLayout>

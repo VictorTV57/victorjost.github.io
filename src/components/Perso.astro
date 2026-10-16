@@ -1,90 +1,102 @@
 ---
 import { favoriteFilms, favoriteGames, nowPlaying, playlist, spotifyUrl, steamUrl } from '../data/perso';
+import { tr, type Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
 
+interface Props {
+  lang: Lang;
+  /** Accueil : seulement les jeux du moment. */
+  compact?: boolean;
+}
+
+const { lang, compact = false } = Astro.props;
+const ui = useUi(lang);
 const swatch = (c: { c1: string; c2: string }) => `--c1:${c.c1};--c2:${c.c2}`;
 ---
 <div class="perso-block reveal">
-  <h3 class="cat-title">Mes jeux du moment</h3>
+  <h3 class="cat-title">{ui.beyond.nowPlaying}</h3>
   <ul class="now-playing">
     {nowPlaying.map((game) => (
       <li>
         <span class="cover" style={swatch(game)} aria-hidden="true"></span>
         <div class="np-info">
-          <strong>{game.title}</strong>
-          <span class="muted">{game.info}</span>
+          <strong>{tr(game.title, lang)}</strong>
+          <span class="muted">{tr(game.info, lang)}</span>
           {game.achievements && (
             <span
               class="bar"
               style={`--p:${Math.round((game.achievements.done / game.achievements.total) * 100)}%`}
               role="img"
-              aria-label={`Succès : ${game.achievements.done} sur ${game.achievements.total}`}
+              aria-label={ui.beyond.achievementsAria(game.achievements.done, game.achievements.total)}
             ></span>
           )}
         </div>
         <span class="np-time">
-          {game.achievements ? `${game.achievements.done} / ${game.achievements.total} succès` : game.time}
+          {game.achievements ? ui.beyond.achievements(game.achievements.done, game.achievements.total) : game.time && tr(game.time, lang)}
         </span>
       </li>
     ))}
   </ul>
-  <a class="more-link" href={steamUrl} target="_blank" rel="noopener">Mon profil Steam <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  <a class="more-link" href={steamUrl} target="_blank" rel="noopener">{ui.beyond.steam} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
 </div>
 
+{!compact && (
+<>
 <div class="perso-block reveal">
-  <h3 class="cat-title">Mes jeux préférés</h3>
+  <h3 class="cat-title">{ui.beyond.favGames}</h3>
   <ol class="covers">
     {favoriteGames.map((game, i) => (
       <li>
         <span class="poster" style={swatch(game)} aria-hidden="true"><span class="rank">{i + 1}</span></span>
-        <strong>{game.title}</strong>
-        <span class="muted">{game.info}</span>
+        <strong>{tr(game.title, lang)}</strong>
+        <span class="muted">{tr(game.info, lang)}</span>
       </li>
     ))}
   </ol>
 </div>
 
 <div class="perso-block reveal">
-  <h3 class="cat-title">Mes films préférés</h3>
+  <h3 class="cat-title">{ui.beyond.favFilms}</h3>
   <ul class="covers films">
     {favoriteFilms.map((film) => (
       <li>
         <span class="poster" style={swatch(film)} aria-hidden="true"></span>
-        <strong>{film.title}</strong>
-        <span class="muted">{film.info}</span>
+        <strong>{tr(film.title, lang)}</strong>
+        <span class="muted">{tr(film.info, lang)}</span>
       </li>
     ))}
   </ul>
 </div>
 
 <div class="perso-block reveal">
-  <h3 class="cat-title">Sur mon Spotify</h3>
+  <h3 class="cat-title">{ui.beyond.spotify}</h3>
   <div class="playlist">
     <div class="pl-head">
       <span class="pl-cover" aria-hidden="true"></span>
       <div>
-        <strong>{playlist.name}</strong>
-        <span class="muted">{playlist.description}</span>
+        <strong>{tr(playlist.name, lang)}</strong>
+        <span class="muted">{tr(playlist.description, lang)}</span>
       </div>
     </div>
     <ol class="tracks">
       {playlist.tracks.map((track, i) => (
         <li>
           <span class="t-num">{i + 1}</span>
-          <span class="t-name"><strong>{track.title}</strong><span class="muted">{track.artist}</span></span>
+          <span class="t-name"><strong>{tr(track.title, lang)}</strong><span class="muted">{tr(track.artist, lang)}</span></span>
           <span class="t-len">{track.length}</span>
         </li>
       ))}
     </ol>
   </div>
-  <a class="more-link" href={spotifyUrl} target="_blank" rel="noopener">Écouter sur Spotify <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  <a class="more-link" href={spotifyUrl} target="_blank" rel="noopener">{ui.beyond.listen} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
 </div>
+</>
+)}
 
 <style>
   .perso-block { margin-bottom: var(--space-12); }
   .perso-block:last-child { margin-bottom: 0; }
-  .more-link { margin-top: var(--space-4); display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; text-decoration: none; }
-  .more-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .more-link svg { width: 14px; height: 14px; }
+  .more-link { margin-top: var(--space-4); }
 
   /* Visuels provisoires : à remplacer par de vraies jaquettes (<img>) */
   .cover, .poster, .pl-cover { display: block; background: linear-gradient(135deg, var(--c1) 0 50%, var(--c2) 50% 100%); }

@@ -1,6 +1,34 @@
 [
-  { "id": "nancy-justice-tech-2026", "order": 1, "date": "2026", "title": "Nancy Justice Tech 2026", "summary": "Ce qu'on a construit, en une phrase.", "result": "Résultat ou prix" },
-  { "id": "nancy-justice-tech-2025", "order": 2, "date": "2025", "title": "Nancy Justice Tech 2025", "summary": "Ce qu'on a construit, en une phrase.", "result": "Résultat ou prix" },
-  { "id": "game-jam-epitech", "order": 3, "date": "Année", "title": "Game Jam EPITECH", "summary": "Le jeu créé, le thème imposé, en une phrase.", "result": "Résultat ou prix" },
-  { "id": "hackin-thionville", "order": 4, "date": "Année", "title": "Hack'In Thionville", "summary": "Ce qu'on a construit, en une phrase.", "result": "Résultat ou prix" }
+  {
+    "id": "nancy-justice-tech-2026",
+    "order": 1,
+    "date": "2026",
+    "title": "Nancy Justice Tech 2026",
+    "summary": { "fr": "Ce qu'on a construit, en une phrase.", "en": "What we built, in one sentence." },
+    "result": { "fr": "Résultat ou prix", "en": "Result or prize" }
+  },
+  {
+    "id": "nancy-justice-tech-2025",
+    "order": 2,
+    "date": "2025",
+    "title": "Nancy Justice Tech 2025",
+    "summary": { "fr": "Ce qu'on a construit, en une phrase.", "en": "What we built, in one sentence." },
+    "result": { "fr": "Résultat ou prix", "en": "Result or prize" }
+  },
+  {
+    "id": "game-jam-epitech",
+    "order": 3,
+    "date": { "fr": "Année", "en": "Year" },
+    "title": "Game Jam EPITECH",
+    "summary": { "fr": "Le jeu créé, le thème imposé, en une phrase.", "en": "The game we made and the theme, in one sentence." },
+    "result": { "fr": "Résultat ou prix", "en": "Result or prize" }
+  },
+  {
+    "id": "hackin-thionville",
+    "order": 4,
+    "date": { "fr": "Année", "en": "Year" },
+    "title": "Hack'In Thionville",
+    "summary": { "fr": "Ce qu'on a construit, en une phrase.", "en": "What we built, in one sentence." },
+    "result": { "fr": "Résultat ou prix", "en": "Result or prize" }
+  }
 ]

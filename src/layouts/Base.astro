@@ -3,25 +3,33 @@ import '../styles/global.css';
 import GridGlow from '../components/GridGlow.astro';
 import Head from '../components/Head.astro';
 import Sprite from '../components/Sprite.astro';
-import { site } from '../data/site';
+import type { Lang } from '../i18n';
 
 interface Props {
-  title?: string;
-  description?: string;
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Adresse de la même page dans chaque langue. */
+  alternates: Record<Lang, string>;
 }
 
-const { title = site.title, description = site.description } = Astro.props;
+const { lang, title, description, alternates } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const absolute = (path: string) => new URL(path, Astro.site).href;
 ---
 <!doctype html>
-<html lang="fr">
+<html lang={lang}>
   <head>
     <Head title={title} description={description}>
       <link rel="canonical" href={canonical} />
+      <link rel="alternate" hreflang="fr" href={absolute(alternates.fr)} />
+      <link rel="alternate" hreflang="en" href={absolute(alternates.en)} />
+      <link rel="alternate" hreflang="x-default" href={absolute(alternates.fr)} />
       <meta property="og:type" content="website" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={canonical} />
+      <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_GB'} />
     </Head>
   </head>
   <body>

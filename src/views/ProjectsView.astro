@@ -1,0 +1,23 @@
+---
+import ProjectCategory from '../components/ProjectCategory.astro';
+import type { Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { CATEGORIES, getProjects } from '../lib/collections';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = useUi(lang);
+const projects = await getProjects();
+---
+<SiteLayout lang={lang} route={{ section: 'projects' }} title={ui.nav.projects}>
+  <section>
+    <h1 class="page-title">{ui.nav.projects}</h1>
+    {CATEGORIES.map((id) => (
+      <ProjectCategory lang={lang} title={ui.categories[id]} projects={projects.filter((p) => p.data.category === id)} />
+    ))}
+  </section>
+</SiteLayout>

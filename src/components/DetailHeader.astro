@@ -1,0 +1,35 @@
+---
+// En-tête d'une page de détail : retour à la liste, surtitre, titre, puis le contenu passé en slot.
+interface Props {
+  back: { href: string; label: string };
+  kicker: string;
+  title: string;
+}
+
+const { back, kicker, title } = Astro.props;
+---
+<a class="back" href={back.href}><svg aria-hidden="true"><use href="#back" /></svg>{back.label}</a>
+<header class="sub-head">
+  <span class="sub-kind">{kicker}</span>
+  <h1>{title}</h1>
+  <div class="sub-body"><slot /></div>
+</header>
+
+<style>
+  .back { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: 700; font-size: 14px; text-decoration: none; padding: 8px 12px; background: var(--surface); border: 1px solid var(--ink-muted); border-radius: var(--radius-sm); color: var(--ink); }
+  .back:hover { border-color: var(--ink); }
+  .back svg { width: 16px; height: 16px; }
+  .sub-head { margin: var(--space-12) 0; }
+  .sub-kind { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
+  h1 { margin: var(--space-2) 0 var(--space-4); font-size: 56px; line-height: 56px; font-weight: 800; letter-spacing: -.02em; overflow-wrap: anywhere; }
+  .sub-body > :global(p) { margin: 0 0 var(--space-4); max-width: 62ch; }
+  .sub-body > :global(.tags) { margin-top: var(--space-6); }
+  .sub-body > :global(.sub-note) { margin: var(--space-6) 0 0; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sub-head { animation: in .5s var(--ease-out); }
+  }
+  @media (max-width: 760px) {
+    h1 { font-size: 40px; line-height: 44px; }
+  }
+</style>

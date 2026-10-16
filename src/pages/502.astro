@@ -1,10 +1,4 @@
 ---
 import ErrorPage from '../layouts/ErrorPage.astro';
 ---
-<ErrorPage
-  code="502"
-  title="Mauvaise passerelle"
-  message="Un serveur intermédiaire n'a pas reçu de réponse valide. C'est souvent passager : recharge la page dans quelques secondes."
-  variant="gap"
-  actions={['retry', 'home']}
-/>
+<ErrorPage code="502" lang="fr" />

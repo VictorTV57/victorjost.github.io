@@ -1,24 +1,35 @@
 ---
-const languages = ['C', 'C++', 'C#', 'Python', 'JavaScript', 'TypeScript'];
-const notions = ['Luau', 'Rust', 'Haskell'];
-const tools = ['.NET MAUI', 'Web API', 'Node.js', 'Vite', 'Astro', 'SQL Server', 'Git'];
+import { languages, notions, spoken, tools } from '../data/skills';
+import { tr, type Lang } from '../i18n';
+import { useUi } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = useUi(lang);
 ---
 <div class="skills reveal">
   <div class="skill-box">
-    <h3>Langages</h3>
+    <h3>{ui.skills.languages}</h3>
     <ul class="tags">{languages.map((s) => <li>{s}</li>)}</ul>
-    <h4>Notions</h4>
+    <h4>{ui.skills.notions}</h4>
     <ul class="tags">{notions.map((s) => <li>{s}</li>)}</ul>
   </div>
   <div class="skill-box">
-    <h3>Frameworks et outils</h3>
+    <h3>{ui.skills.tools}</h3>
     <ul class="tags">{tools.map((s) => <li>{s}</li>)}</ul>
   </div>
   <div class="skill-box langs">
-    <h3>Langues</h3>
+    <h3>{ui.skills.spoken}</h3>
     <dl>
-      <div><dt>Français</dt><dd>Langue maternelle</dd></div>
-      <div><dt>Anglais</dt><dd>825 au TEPitech <span class="muted">(équivalent TOEIC)</span></dd></div>
+      {spoken.map((s) => (
+        <div>
+          <dt>{tr(s.name, lang)}</dt>
+          <dd>{tr(s.level, lang)}{s.note && <> <span class="muted">{tr(s.note, lang)}</span></>}</dd>
+        </div>
+      ))}
     </dl>
   </div>
 </div>

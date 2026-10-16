@@ -1,0 +1,67 @@
+---
+import Hackathons from '../components/Hackathons.astro';
+import Perso from '../components/Perso.astro';
+import ProjectCategory from '../components/ProjectCategory.astro';
+import Skills from '../components/Skills.astro';
+import Timeline from '../components/Timeline.astro';
+import { about } from '../data/about';
+import { steps } from '../data/parcours';
+import type { Lang } from '../i18n';
+import { href } from '../i18n/routes';
+import { useUi } from '../i18n/ui';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { CATEGORIES, getHackathons, getProjects } from '../lib/collections';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = useUi(lang);
+
+const projects = await getProjects();
+// L'accueil montre le premier projet de chaque catégorie, la page Projets montre tout
+const featured = CATEGORIES.map((id) => ({ id, projects: projects.filter((p) => p.data.category === id).slice(0, 1) }));
+const hackathons = (await getHackathons()).slice(0, 2);
+const ongoing = steps.filter((step) => step.now);
+---
+<SiteLayout lang={lang} route={{ section: 'home' }}>
+  <section id="a-propos">
+    <h2>{ui.about}</h2>
+    <div class="prose reveal">
+      {about[lang].map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+  </section>
+
+  <section id="projets">
+    <h2>{ui.nav.projects}</h2>
+    {featured.map((cat) => <ProjectCategory lang={lang} title={ui.categories[cat.id]} projects={cat.projects} />)}
+    <a class="more-link" href={href(lang, 'projects')}>{ui.projects.seeAll(projects.length)} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  </section>
+
+  <section id="hackathons">
+    <h2>{ui.nav.hackathons}</h2>
+    <p class="muted section-intro">{ui.hackathons.intro}</p>
+    <Hackathons lang={lang} items={hackathons} />
+    <a class="more-link" href={href(lang, 'hackathons')}>{ui.hackathons.seeAll} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  </section>
+
+  <section id="parcours">
+    <h2>{ui.nav.journey}</h2>
+    <Timeline lang={lang} items={ongoing} />
+    <a class="more-link" href={href(lang, 'journey')}>{ui.journey.seeAll} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  </section>
+
+  <section id="competences">
+    <h2>{ui.nav.skills}</h2>
+    <Skills lang={lang} />
+    <a class="more-link" href={href(lang, 'skills')}>{ui.skills.seeAll} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  </section>
+
+  <section id="perso">
+    <h2>{ui.nav.beyond}</h2>
+    <p class="muted section-intro">{ui.beyond.intro}</p>
+    <Perso lang={lang} compact />
+    <a class="more-link" href={href(lang, 'beyond')}>{ui.beyond.seeAll} <svg aria-hidden="true"><use href="#arrow" /></svg></a>
+  </section>
+</SiteLayout>

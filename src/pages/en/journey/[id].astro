@@ -1,0 +1,11 @@
+---
+import type { InferGetStaticPropsType } from 'astro';
+import { stepPaths } from '../../../lib/collections';
+import StepView from '../../../views/StepView.astro';
+
+export const getStaticPaths = stepPaths;
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { step } = Astro.props;
+---
+<StepView lang="en" step={step} />
