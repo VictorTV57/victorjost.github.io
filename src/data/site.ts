@@ -11,10 +11,10 @@ export const site = {
     fr: 'Étudiant développeur en 3e année à EPITECH Nancy. Applis, sites, systèmes de jeu et une voiture qui roule toute seule.',
     en: '3rd-year developer student at EPITECH Nancy. Apps, websites, game systems and a car that drives itself.',
   } satisfies Localized,
-  /** Badge de disponibilité : à adapter (ex. « Recherche un stage de X mois, à partir de ... »). */
+  /** Badge de disponibilité, sous le pitch. */
   availability: {
-    fr: 'Ta disponibilité ici',
-    en: 'Your availability here',
+    fr: 'Stage à temps complet du 29 mars au 31 août 2027',
+    en: 'Full-time internship, 29 March to 31 August 2027',
   } satisfies Localized,
   email: 'victor.jost@epitech.eu',
   github: 'https://github.com/VictorTV57',
